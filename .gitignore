@@ -1,0 +1,13 @@
+.vscode
+.mypy_cache
+docker-stack.yml
+__pycache__
+app.egg-info
+.mypy_cache
+.coverage
+htmlcov
+files
+.env
+
+.DS_Store
+.pytest_cache

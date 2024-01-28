@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+
+  backend:
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+    environment:
+      - SERVER_HOST=http://${DOMAIN?Variable not set}
+    # command: bash -c "while true; do sleep 1; done"  # Infinite loop to keep container live doing nothing - Can be useful during migration
+    command: /start-reload.sh

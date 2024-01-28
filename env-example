@@ -1,0 +1,53 @@
+# DOMAIN=<YOUR_PROJECT_DOMAIN>
+DOMAIN=localhost
+
+
+# STACK_NAME=<PROJECT_NAME>-com
+STACK_NAME=template-com
+ENV_CONFIG=dev
+
+DOCKER_IMAGE_BACKEND=backend-template
+
+# Backend
+# Complete and adapt this list to your own domain or local development need
+# By default cors are disabled for dev environment
+BACKEND_CORS_ORIGINS=["http://localhost","http://localhost:4200","http://localhost:4000","http://localhost:3000","http://localhost:8080","https://localhost","https://localhost:4200","https://localhost:3000","https://localhost:8080","http://dev.customdomain.com","https://stag.customdomain.com","https://customdomain.com"]
+PROJECT_NAME=Template project - FastAPI 
+SECRET_KEY=some-super-secret-key
+FIRST_SUPERUSER=admin@example.com
+FIRST_SUPERUSER_PASSWORD=Password1234
+# Uncomment those lines if you want to activate notification email in the project
+; SMTP_TLS=False
+; SMTP_SSL=True
+; SMTP_PORT=465
+; SMTP_HOST=example.com
+; SMTP_USER=admin@example.com
+; SMTP_PASSWORD=YOUR_EMAIL_PASSWORD
+; EMAILS_FROM_EMAIL=admin@example.com
+
+# Postgres
+POSTGRES_SERVER=db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=some-super-secret-password
+POSTGRES_DB=template-app
+
+# PgAdmin
+PGADMIN_DEFAULT_EMAIL=admin@example.com
+PGADMIN_DEFAULT_PASSWORD=Password1234
+
+# Uncomment the lines of the providers you plan to use in your project
+# SSO
+# Make sure to put the values in double quotes to avoid parsing errors from pydantic
+
+# Google
+; GOOGLE_CLIENT_ID="YOUR_GOOGLE_CLIENT_ID"
+; GOOGLE_CLIENT_SECRET="YOUR_GOOGLE_CLIENT_SECRET"
+
+# Facebook
+; FACEBOOK_CLIENT_ID="YOUR_FAKBOOK_CLIENT_ID"
+; FACEBOOK_CLIENT_SECRET="YOUR_FACEBOOK_CLIENT_SECRET"
+
+# Github
+; GITHUB_CLIENT_ID="YOUR_GITHUB_CLIENT_ID"
+; GITHUB_CLIENT_SECRET="YOUR_GITHUB_CLIENT_SECRET"
+

@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+
+  db:
+    image: postgres:15
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/pgdata
+    env_file:
+      - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    deploy:
+      placement:
+        constraints:
+          - node.labels.${STACK_NAME?Variable not set}.app-db-data == true
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    networks:
+      - default
+    env_file:
+      - .env
+    ports:
+      - 5050:5050
+
+  backend:
+    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    env_file:
+      - .env
+    volumes:
+      - app-file-storage:/app/files
+    environment:
+      - SERVER_NAME=${DOMAIN?Variable not set}
+      - SERVER_HOST=http://${DOMAIN?Variable not set}
+      # Allow explicit env var override for tests
+      - SMTP_HOST=${SMTP_HOST}
+    ports:
+      - 80:80
+
+volumes:
+  app-db-data:
+  app-file-storage:
