@@ -198,3 +198,11 @@ It could be used as it is in the context of testing or for a small scale deploym
 ### Ideas for later
 - Update to utilize Async technology (for endpoints that can benefit from it) https://medium.com/@neverwalkaloner/fastapi-with-async-sqlalchemy-celery-and-websockets-1b40cd9528da#:~:text=Starting%20from%20version%201.4%20SQLAlchemy,let's%20start%20with%20database%20connection. https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
 - Migration to psycopg v3 could be considered in a future version of the template
+
+### Usage rights
+
+This template is Open-Sourced under the MIT license. This basically means that all contributions are welcome and encourage and that your can use this template or fork it for your personal and commercial use 🥳
+
+If you have questions or encounter any difficulty while using this repo do not hesitate to use the GitHub Discussions channel.
+
+If you need help to realize your project or commercial collaboration please reach out to our team by email [contact@bereyziat.dev](mailto:contact@bereyziat.dev) or check our [Website: bereyziat.dev](https://bereyziat.dev)
