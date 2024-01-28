@@ -48,9 +48,7 @@ async def create_user(
     user = crud.user.create(db, obj_in=user_in, role=role)
     background_tasks.add_task(
         send_new_account_email,
-        email_to=user_in.email,
-        username=user_in.email,
-        password=user_in.password,
+        email=user_in.email
     )
     return user
 

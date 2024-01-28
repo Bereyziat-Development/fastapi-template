@@ -36,13 +36,11 @@ def do_nothing(*args, **kwargs):
     return None
 
 
-def test_create_user_new_email(
-    monkeypatch, client: TestClient, superuser_token_headers: dict, db: Session
+def test_create_user_new_email(client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     username = random_email()
     password = random_lower_string()
     data = {"email": username, "password": password}
-    monkeypatch.setattr("app.email_service.auth.send_new_account_email", do_nothing)
     with patch("fastapi.BackgroundTasks.add_task", side_effect=do_nothing):
         r = client.post(
             f"{settings.API_V1_STR}/users/",

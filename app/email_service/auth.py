@@ -25,7 +25,7 @@ def send_new_account_email(email: str) -> None:
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - New account for user {email}"
     template_str = EmailTemplate.NEW_ACCOUNT.file()
-    link = settings.SERVER_HOST
+    link = settings.WEB_APP_URL
     send_email(
         email_to=email,
         subject_template=subject,
