@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
-from .soft_deletable import Archivable
+from .archivable import Archivable
 
 if TYPE_CHECKING:
     from .file import File  # noqa: F401

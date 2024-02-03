@@ -36,7 +36,8 @@ def do_nothing(*args, **kwargs):
     return None
 
 
-def test_create_user_new_email(client: TestClient, superuser_token_headers: dict, db: Session
+def test_create_user_new_email(
+    client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     username = random_email()
     password = random_lower_string()

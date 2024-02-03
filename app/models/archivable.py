@@ -1,5 +1,3 @@
-from typing import TypeVar
-
 from sqlalchemy import Column, DateTime
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -14,6 +12,3 @@ class Archivable:
     @archived.expression
     def archived(cls):
         return cls.archived_at != None
-
-
-ArchivableType = TypeVar("ArchivableType", bound=Archivable)

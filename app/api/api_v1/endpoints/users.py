@@ -46,10 +46,7 @@ async def create_user(
             detail="The user with this username already exists in the system.",
         )
     user = crud.user.create(db, obj_in=user_in, role=role)
-    background_tasks.add_task(
-        send_new_account_email,
-        email=user_in.email
-    )
+    background_tasks.add_task(send_new_account_email, email=user_in.email)
     return user
 
 
@@ -144,7 +141,7 @@ def archive_user(
     _: models.User = Depends(deps.get_current_admin_user),
 ) -> Any:
     """
-    ADMIN: Soft delete a user.
+    ADMIN: Archive a user.
     """
     user = crud.user.get(db, id=user_id)
     if not user:

@@ -6,7 +6,7 @@ Using FastAPI and based on [fullstack example project of Tiangolo](https://githu
 
 Here is what you will be able to find out the box here:
 
-- 🚀 OAuth2.0: authentication with refresh Token
+- 🚀 OAuth2.0: Authentication by JWT with access Token and refresh Token
 - 🥸 SSO: pre-configured auth with Facebook, Github and Google
 - 📧 Email service: delegated email service using SMTP
 - 📜 MJML: email templating

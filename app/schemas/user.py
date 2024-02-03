@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 from pydantic.types import UUID4
 
 from app.models.user import Provider, Role
-from app.schemas.soft_deletable import Archivable
+from app.schemas.archivable import Archivable
 
 
 # Shared properties

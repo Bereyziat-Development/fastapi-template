@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.base_class import Base
 
-from .soft_deletable import Archivable
+from .archivable import Archivable
 
 
 class Item(Base, Archivable):

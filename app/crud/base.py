@@ -8,7 +8,7 @@ from sqlalchemy.orm import Query, Session
 from sqlalchemy.sql.expression import false
 
 from app.db.base_class import ModelType
-from app.models.soft_deletable import Archivable
+from app.models.archivable import Archivable
 from app.utils import ModelType, apply_changes
 
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)

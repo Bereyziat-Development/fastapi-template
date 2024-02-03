@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 from pydantic.types import UUID4
 
-from app.schemas.soft_deletable import Archivable
+from app.schemas.archivable import Archivable
 
 
 # Shared properties
