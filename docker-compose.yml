@@ -25,6 +25,8 @@ services:
 
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    build:
+      dockerfile: backend.dockerfile
     env_file:
       - .env
     volumes:
