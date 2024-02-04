@@ -24,6 +24,8 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python
 # Copy poetry.lock* in case it doesn't exist in the repo
 COPY ./pyproject.toml ./poetry.lock* /app/
 
+ARG ENV_CONFIG
+
 # Allow installing dev dependencies in "dev" environment to run tests and lint
 RUN bash -c "if [ $ENV_CONFIG == 'dev' ] ; then poetry install --no-root ; else poetry install --no-root --without dev ; fi"
 
