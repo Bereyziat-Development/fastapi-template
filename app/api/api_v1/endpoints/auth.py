@@ -24,6 +24,25 @@ from app.email_service.auth import send_reset_password_email
 router = APIRouter()
 
 
+@router.post("/register", response_model=schemas.AuthResponse)
+def register_email_user(
+    *,
+    db: Session = Depends(deps.get_db),
+    user_in: schemas.UserCreate,
+) -> Any:
+    """
+    Register as new user to the application.
+    """
+    user = crud.user.get_by_email(db, email=user_in.email)
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="The user with this username already exists in the system.",
+        )
+    user = crud.user.create(db, obj_in=user_in)
+    return create_login_response(user)
+
+
 @router.get("/{provider}/login")
 async def sso_login(
     *, sso: SSOBase = Depends(deps.get_generic_sso), return_url: str
@@ -50,7 +69,7 @@ async def sso_callback(
     return RedirectResponse(f"{sso.state}?token={token}")
 
 
-@router.post("/sso/confirm", response_model=schemas.LoginResponse)
+@router.post("/sso/confirm", response_model=schemas.AuthResponse)
 def get_sso_access_token(
     user: models.User = Depends(deps.get_user_after_sso_confirmation),
 ) -> Any:
@@ -60,7 +79,7 @@ def get_sso_access_token(
     return create_login_response(user)
 
 
-@router.post("/login/access-token", response_model=schemas.LoginResponse)
+@router.post("/login/access-token", response_model=schemas.AuthResponse)
 def login_access_token(
     db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
@@ -78,7 +97,7 @@ def login_access_token(
     return create_login_response(user)
 
 
-@router.post("/refresh", response_model=schemas.LoginResponse)
+@router.post("/refresh", response_model=schemas.AuthResponse)
 def refresh_token(user: models.User = Depends(deps.get_user_from_refresh_token)) -> Any:
     """
     Refresh authentication information using a refresh token
@@ -145,8 +164,8 @@ def reset_password(
     return {"msg": "Password updated successfully"}
 
 
-def create_login_response(user: models.User) -> schemas.LoginResponse:
-    return schemas.LoginResponse(
+def create_login_response(user: models.User) -> schemas.AuthResponse:
+    return schemas.AuthResponse(
         access_token=security.create_access_token(user.id),
         refresh_token=security.create_refresh_token(user.id),
         token_type="bearer",

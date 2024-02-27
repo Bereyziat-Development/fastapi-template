@@ -13,7 +13,7 @@ class TokenContext(str, Enum):
     SSO_CONFIRMATION_TOKEN = "sso_confirmation_token"
 
 
-class LoginResponse(BaseModel):
+class AuthResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str

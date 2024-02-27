@@ -34,6 +34,7 @@ services:
     volumes:
       - app-file-storage:/app/files
     environment:
+      - ENV_CONFIG=${ENV_CONFIG-dev}
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=http://${DOMAIN?Variable not set}
     ports:

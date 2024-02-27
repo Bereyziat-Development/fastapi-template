@@ -7,6 +7,8 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql import expression
 from sqlalchemy.types import DateTime
 
+from app.utils import to_snake_case
+
 from sqlalchemy.orm import as_declarative, declared_attr  # type: ignore # isort: skip
 
 
@@ -33,7 +35,7 @@ class Base:
     # Generate __tablename__ automatically
     @declared_attr
     def __tablename__(cls) -> str:
-        return cls.__name__.lower()
+        return to_snake_case(cls.__name__)
 
 
 ModelType = TypeVar("ModelType", bound=Base)
