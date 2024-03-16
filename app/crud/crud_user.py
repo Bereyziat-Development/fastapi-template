@@ -12,7 +12,7 @@ from app.core.security import (
 from app.crud.base import CRUDBase
 from app.models import Provider, Role, User
 from app.schemas import UserCreate, UserUpdate
-from app.utils import apply_changes
+from .base import apply_changes
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):

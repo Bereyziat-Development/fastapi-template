@@ -37,5 +37,3 @@ class Base:
     def __tablename__(cls) -> str:
         return to_snake_case(cls.__name__)
 
-
-ModelType = TypeVar("ModelType", bound=Base)

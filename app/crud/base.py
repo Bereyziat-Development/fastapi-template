@@ -7,13 +7,18 @@ from pydantic.types import UUID4
 from sqlalchemy.orm import Query, Session
 from sqlalchemy.sql.expression import false
 
-from app.db.base_class import ModelType
+from app.db.base_class import Base
 from app.models.archivable import Archivable
-from app.utils import ModelType, apply_changes
 
+ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
+
+def apply_changes(db: Session, db_item: ModelType) -> None:
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, model: Type[ModelType]):
@@ -27,20 +32,20 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def filter_archivable(self, query: Query, with_archived: Optional[bool] = False):
+    def filter_archivable(self, query: Query, with_archived: bool = False):
         if issubclass(self.model, Archivable) and not with_archived:
             query = query.filter(self.model.archived == false())
         return query
 
     def get(
-        self, db: Session, id: UUID4, with_archived: Optional[bool] = False
+        self, db: Session, id: UUID4, with_archived: bool = False
     ) -> Optional[ModelType]:
         query: Query = db.query(self.model).filter(self.model.id == id)
         query = self.filter_archivable(query, with_archived)
         return query.first()
 
     def get_all(
-        self, db: Session, with_archived: Optional[bool] = False
+        self, db: Session, with_archived: bool = False
     ) -> List[ModelType]:
         query = db.query(self.model)
         query = self.filter_archivable(query, with_archived)
@@ -52,7 +57,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         *,
         skip: int = 0,
         limit: int = 100,
-        with_archived: Optional[bool] = False
+        with_archived: bool = False
     ) -> List[ModelType]:
         query = db.query(self.model)
         query = self.filter_archivable(query, with_archived)

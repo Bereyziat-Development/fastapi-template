@@ -6,7 +6,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.core.config import settings
 from app.db.base_class import Base
-from app.utils import FILE_PATH
 
 from .archivable import Archivable
 
@@ -21,7 +20,7 @@ class File(Base, Archivable):
 
     @hybrid_property
     def file_path(self):
-        return FILE_PATH + self.filename
+        return settings.FILE_PATH + self.filename
 
     @hybrid_property
     def user_profile_pic_url(self) -> Optional[str]:

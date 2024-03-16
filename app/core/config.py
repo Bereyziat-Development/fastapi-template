@@ -72,6 +72,8 @@ class Settings(BaseSettings):
     GITHUB_CLIENT_SECRET: Optional[str] = None
     GITHUB_SSO_ENABLED: bool = False
 
+    FILE_PATH: str = "/app/app/files/"
+
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(
