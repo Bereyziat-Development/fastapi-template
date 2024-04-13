@@ -6,6 +6,7 @@ from pydantic.networks import EmailStr
 from app import models, schemas
 from app.api import deps
 from app.email_service.test import send_test_email
+from app.models import Role
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ router = APIRouter()
 )
 def test_email(
     email_to: EmailStr,
-    _: models.User = Depends(deps.get_current_admin_user),
+    _: models.User = Depends(deps.require_role(Role.ADMIN)),
 ) -> Any:
     """
     Test emails.

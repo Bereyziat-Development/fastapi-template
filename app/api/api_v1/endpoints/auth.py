@@ -1,14 +1,6 @@
 from typing import Any
 
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Body,
-    Depends,
-    HTTPException,
-    Request,
-    status,
-)
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_sso.sso.base import SSOBase
@@ -17,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.api.exceptions import HTTPException
 from app.core import security
 from app.core.security import get_password_hash
 from app.email_service.auth import send_reset_password_email

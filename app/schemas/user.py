@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, EmailStr
 from pydantic.types import UUID4
 
-from app.models.user import Provider, Role
+from app.models.user import Provider, Role, DEFAULT_LANGUAGE, Language
 from app.schemas.archivable import Archivable
 
 
@@ -12,6 +12,7 @@ class UserBase(BaseModel):
     email: Optional[EmailStr] = "user@example.com"
     first_name: Optional[str] = "John"
     last_name: Optional[str] = "Doe"
+    language: Optional[Language] = DEFAULT_LANGUAGE
 
 
 # Properties to receive via API on creation of an Email User
@@ -33,6 +34,7 @@ class UserInDBBase(UserBase, Archivable):
     id: UUID4
     confirmed: Optional[bool]
     role: Role
+    language: Language
     provider: Provider
     is_admin: bool
     is_moderator: bool

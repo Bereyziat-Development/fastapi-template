@@ -121,6 +121,7 @@ sh ./scripts/test-local.sh
 Because the test scripts forward arguments to `pytest`, for example:
 - ` --cov=app --cov-report=html` to enable test coverage HTML report generation
 - `-x` to stop the tests at the fist failing test, which can be useful for debugging.
+- `-k "test_api_users"` to run test that are matching the provided string, this can come in handy to isolate a given test or a group of tests.
 
 To run the local tests with coverage HTML reports:
 

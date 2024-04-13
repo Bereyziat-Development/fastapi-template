@@ -1,5 +1,4 @@
 import uuid
-from typing import TypeVar
 
 from sqlalchemy import Column, DateTime
 from sqlalchemy.dialects.postgresql import UUID
@@ -36,4 +35,3 @@ class Base:
     @declared_attr
     def __tablename__(cls) -> str:
         return to_snake_case(cls.__name__)
-

@@ -9,4 +9,4 @@ from .archivable import Archivable
 class Item(Base, Archivable):
     name = Column(String)
     description = Column(String)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("person.id"))

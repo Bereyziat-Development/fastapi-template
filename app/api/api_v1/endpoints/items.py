@@ -1,11 +1,13 @@
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.api.exceptions import HTTPItemNotFound, HTTPNotEnoughPermissions
+from app.models import Role
 
 router = APIRouter()
 
@@ -49,7 +51,7 @@ def create_item_admin(
     *,
     db: Session = Depends(deps.get_db),
     item_in: schemas.ItemCreate,
-    _: models.User = Depends(deps.get_current_admin_user),
+    current_user: models.User = Depends(deps.require_role(Role.ADMIN)),
     user_id: UUID4,
 ) -> Any:
     """
@@ -57,9 +59,7 @@ def create_item_admin(
     """
     user = crud.user.get(db=db, id=user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPItemNotFound(current_user.language)
     item = crud.item.create_with_user(db=db, obj_in=item_in, user=user)
     return item
 
@@ -76,14 +76,10 @@ def update_item(
     Update an item.
     """
     item = crud.item.get(db=db, id=id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
-        )
+    if item is None:
+        raise HTTPItemNotFound(current_user.language)
     if not current_user.is_admin and (item.user_id != current_user.id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
-        )
+        raise HTTPNotEnoughPermissions(current_user.language)
     item = crud.item.update(db=db, db_obj=item, obj_in=item_in)
     return item
 
@@ -99,14 +95,10 @@ def read_item(
     Get item by ID.
     """
     item = crud.item.get(db=db, id=id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
-        )
+    if item is None:
+        raise HTTPItemNotFound(current_user.language)
     if not current_user.is_admin and (item.user_id != current_user.id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
-        )
+        raise HTTPNotEnoughPermissions(current_user.language)
     return item
 
 
@@ -121,13 +113,9 @@ def delete_item(
     Delete an item.
     """
     item = crud.item.get(db=db, id=id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
-        )
+    if item is None:
+        raise HTTPItemNotFound(current_user.language)
     if not current_user.is_admin and (item.user_id != current_user.id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
-        )
+        raise HTTPNotEnoughPermissions(current_user.language)
     item = crud.item.remove(db, item)
     return item

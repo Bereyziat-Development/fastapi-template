@@ -14,6 +14,14 @@ if TYPE_CHECKING:
     from .item import Item  # noqa: F401
 
 
+class Language(str, Enum):
+    EN = "en"
+    FR = "fr"
+
+
+DEFAULT_LANGUAGE = Language.EN
+
+
 class Role(str, Enum):
     ADMIN = "admin"
     MODERATOR = "moderator"
@@ -32,10 +40,13 @@ SSOProvider = Literal[Provider.GOOGLE, Provider.FACEBOOK, Provider.GITHUB]
 
 
 class User(Base, Archivable):
+    # Override the table name to avoid any confusion with SQL reserved word "user" during generated migration scripts
+    __tablename__ = "person"
     # Authentication
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String)
     role = Column(String, default=Role.CUSTOMER, nullable=False)
+    language = Column(String, default=DEFAULT_LANGUAGE, nullable=False)
     confirmed = Column(Boolean, default=False)
     sso_confirmation_code = Column(String)
     # Personal information

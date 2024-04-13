@@ -16,7 +16,7 @@ class File(Base, Archivable):
     mime_type = Column(String)
     # Name of the file in the filesystem on the server
     filename = Column(String)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("person.id"))
 
     @hybrid_property
     def file_path(self):

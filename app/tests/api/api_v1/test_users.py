@@ -11,7 +11,7 @@ from app.tests.utils.user import authentication_token_from_email, create_random_
 from app.tests.utils.utils import random_email, random_lower_string
 
 
-def test_get_users_superuser_me(
+def test_api_users_get_me_as_admin(
     client: TestClient, superuser_token_headers: Dict[str, str]
 ) -> None:
     r = client.get(f"{settings.API_V1_STR}/users/me", headers=superuser_token_headers)
@@ -22,7 +22,7 @@ def test_get_users_superuser_me(
     assert current_user["email"] == settings.FIRST_SUPERUSER
 
 
-def test_get_users_normal_user_me(
+def test_api_users_get_me_as_normal_user(
     client: TestClient, normal_user_token_headers: Dict[str, str]
 ) -> None:
     r = client.get(f"{settings.API_V1_STR}/users/me", headers=normal_user_token_headers)
@@ -36,7 +36,7 @@ def do_nothing(*args, **kwargs):
     return None
 
 
-def test_create_user_new_email(
+def test_api_users_create(
     client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     username = random_email()
@@ -55,7 +55,7 @@ def test_create_user_new_email(
     assert user.email == created_user["email"]
 
 
-def test_get_existing_user(
+def test_api_users_get_by_id(
     client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     user = create_random_user(db)
@@ -70,7 +70,7 @@ def test_get_existing_user(
     assert existing_user.email == api_user["email"]
 
 
-def test_create_user_existing_username(
+def test_api_users_create_with_existing_username(
     client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     user = create_random_user(db)
@@ -84,7 +84,7 @@ def test_create_user_existing_username(
     assert r.status_code == status.HTTP_409_CONFLICT
 
 
-def test_create_user_by_normal_user(
+def test_api_users_create_as_a_normal_user(
     client: TestClient, normal_user_token_headers: Dict[str, str]
 ) -> None:
     email = random_email()
@@ -98,7 +98,7 @@ def test_create_user_by_normal_user(
     assert r.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_retrieve_users(
+def test_api_users_get_multiple(
     client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     create_random_user(db)
@@ -112,7 +112,19 @@ def test_retrieve_users(
         assert "email" in item
 
 
-def test_archive_user(
+def test_api_users_get_multiple_unauthorized(client: TestClient) -> None:
+    r = client.get(f"{settings.API_V1_STR}/users/")
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_api_users_get_multiple_as_normal_user(
+    client: TestClient, normal_user_token_headers: Dict[str, str]
+) -> None:
+    r = client.get(f"{settings.API_V1_STR}/users/", headers=normal_user_token_headers)
+    assert r.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_api_users_archive(
     client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     user_before_archive = create_random_user(db)
@@ -130,7 +142,7 @@ def test_archive_user(
     assert user_after_archive.archived is True
 
 
-def test_unarchive_user(
+def test_api_users_unarchive(
     client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     user_before_archive = create_random_user(db)
@@ -156,7 +168,7 @@ def test_unarchive_user(
     assert user_after_unarchive.archived is False
 
 
-def test_archive_current_user(
+def test_api_users_archive_self(
     client: TestClient, superuser_token_headers: dict, db: Session
 ) -> None:
     # WARNING: if the current test fails of fails partially it can yield an archived test user. To fix this log in to localhost/docs as an admin user and unarchive the test user.

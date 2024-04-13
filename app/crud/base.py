@@ -20,6 +20,7 @@ def apply_changes(db: Session, db_item: ModelType) -> None:
     db.commit()
     db.refresh(db_item)
 
+
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, model: Type[ModelType]):
         """
@@ -44,9 +45,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         query = self.filter_archivable(query, with_archived)
         return query.first()
 
-    def get_all(
-        self, db: Session, with_archived: bool = False
-    ) -> List[ModelType]:
+    def get_all(self, db: Session, with_archived: bool = False) -> List[ModelType]:
         query = db.query(self.model)
         query = self.filter_archivable(query, with_archived)
         return query.all()
