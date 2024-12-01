@@ -1,6 +1,10 @@
 # DOMAIN=<YOUR_PROJECT_DOMAIN>
 DOMAIN=localhost
 
+# Traefik setup
+TRAEFIK_PUBLIC_NETWORK=traefik-public
+TRAEFIK_TAG=template-com
+TRAEFIK_PUBLIC_TAG=traefik-public
 
 # STACK_NAME=<PROJECT_NAME>-com
 STACK_NAME=template-com
