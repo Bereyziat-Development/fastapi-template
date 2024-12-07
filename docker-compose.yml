@@ -9,7 +9,7 @@ services:
     command:
       - --providers.swarm=true
       - --providers.docker.constraints=Label(`traefik.constraint-label-stack`, `${TRAEFIK_TAG?Variable not set}`)
-      - --providers.docker.exposedbydefault=false
+      - --providers.swarm.exposedbydefault=false
       - --accesslog=true
       - --log=true
       - --api.dashboard=true
