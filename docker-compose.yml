@@ -90,13 +90,13 @@ services:
         - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`)
         - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
 
-whoami:
-    image: "traefik/whoami"
-    container_name: "simple-service"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`${DOMAIN?Variable not set}`)"
-      - "traefik.http.routers.whoami.entrypoints=web"
+  whoami:
+      image: "traefik/whoami"
+      container_name: "simple-service"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.whoami.rule=Host(`${DOMAIN?Variable not set}`)"
+        - "traefik.http.routers.whoami.entrypoints=web"
 
 volumes:
   app-db-data:
