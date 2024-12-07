@@ -1,6 +1,7 @@
 services:
   proxy:
-    image: traefik:3.0
+    image: traefik:3.2
+    container_name: name
     networks:
       - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
       - default
@@ -70,7 +71,7 @@ services:
         - traefik.http.services.${STACK_NAME?Variable not set}-pgadmin.loadbalancer.server.port=5050
 
   backend:
-    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    container_name: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     build:
       dockerfile: backend.dockerfile
       args:
@@ -88,6 +89,14 @@ services:
         - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
         - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`)
         - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
+
+whoami:
+    image: "traefik/whoami"
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`${DOMAIN?Variable not set}`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
 
 volumes:
   app-db-data:
