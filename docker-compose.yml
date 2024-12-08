@@ -30,7 +30,11 @@ services:
 
       # Backend service
   backend:
-    image: "lestario-backend"
+    image: "lestario-backend:latest"
+    build:
+      dockerfile: backend.dockerfile
+      args:
+        ENV_CONFIG: ${ENV_CONFIG-dev}
     container_name: "backend"
     env_file:
       - .env
