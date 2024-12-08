@@ -64,7 +64,6 @@ services:
   # PGAdmin service
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: "pgadmin"
     env_file:
       - .env
     networks:
@@ -72,9 +71,9 @@ services:
       - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)"
+      - "traefik.http.routers.pgadmin.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin.tls.certresolver=myresolver"
 
 networks:
   traefik-public:
