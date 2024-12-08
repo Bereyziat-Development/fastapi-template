@@ -141,4 +141,111 @@ cd /var/www
 To clone your project, you can use https, in this case you will need a password but in general you will want to setup an ssh connection with your server. To do so you will have to go to the home of your user and create an ssh key. Then add the ssh key of your limited user to your GH account. Depending on your security requirements you may want to consider other approaches with limited access keys for example.
 
 
+# Deploy your stack
+This is an example of how to quickly deploy your project. Keep in mind to challenge this configuration bases on your project scale and requirements.
 
+## Setup your project
+
+Set the hostname of your server
+````
+export USE_HOSTNAME=service.lestario.com
+echo $USE_HOSTNAME > /etc/hostname
+hostname -F /etc/hostname
+````
+
+Download and install docker
+````
+curl -fsSL get.docker.com -o get-docker.sh
+CHANNEL=stable sh get-docker.sh
+rm get-docker.sh
+````
+
+Download and install docker-compose
+WARNING: This download channel should be pretty up to date but don't hesitate to refer to the official docker compose documentation
+````
+curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+source ~/.profile
+docker-compose --version
+````
+
+Init the docker swarm
+````
+docker swarm init
+docker node ls
+````
+
+WARNING: Depending on your server configuration you may need to assign the ip address manual using this command instead
+````
+docker swarm init --advertise-addr <YOUR_IP_ADDRESS>
+````
+
+Create the traefik public network
+````
+docker network create --driver=overlay traefik-public
+````
+
+Export those env vars 
+````
+export TAG=stag
+export ENV_CONFIG=stag
+export DOMAIN=yourdomain.com
+export TRAEFIK_TAG=yourdomain.com
+export STACK_NAME=yourdomain-com
+````
+
+WARNING: Depending on your project requirements you may want to avoid setting secret data using .env or variable export. A more production ready solution would be to use a secret manager.
+
+IMPORTANT: Don't forget to add your project .env file. You will have to do this manually or via scp since the .env is not in the base repo
+
+**Deploy your stack in one line**
+````
+bash scripts/deploy.sh
+````
+
+
+# Update your stack
+Get the latest version of you repo
+````
+sudo git pull
+````
+
+Set the env vars:
+````
+export TAG=stag
+export ENV_CONFIG=stag
+export DOMAIN=yourdomain.com
+export TRAEFIK_TAG=yourdomain.com
+export STACK_NAME=yourdomain-com
+````
+Rebuild and deploy your project using the deploy.sh script. To make sure your changes are propagated to your website make sure to restart your backend container.
+````
+bash scripts/deploy.sh
+
+docker service update --force your-stack-name_backend -d
+````
+
+You can now check the logs of your app and grab a coffee ☕️ while watching request popping in:
+````
+docker ps
+docker logs <backend-container-id> -f
+````
+
+# How to completely delete my stack?
+````
+docker stack rm service-lestario-api
+docker swarm leave --force
+````
+
+Remove containers and images of your project
+````
+docker rm -f $(docker ps -a -q)
+docker volume rm $(docker volume ls -q)
+````
+
+
+You can also remove all the docker data with:
+````
+docker system prune
+````

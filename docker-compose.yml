@@ -1,9 +1,6 @@
-version: "3.9"
-
 services:
   traefik:
-    image: "traefik:v3.2"
-    container_name: "traefik"
+    image: "traefik:v3.3"
     command:
       - "--log.level=DEBUG" # Optional, helps in debugging
       - "--api.insecure=true" # Enable Traefik dashboard (accessible at :8080)
@@ -34,8 +31,7 @@ services:
     build:
       dockerfile: backend.dockerfile
       args:
-        ENV_CONFIG: ${ENV_CONFIG-dev}
-    container_name: "backend"
+        ENV_CONFIG: ${ENV_CONFIG-dev}x
     env_file:
       - .env
     environment:
@@ -53,7 +49,6 @@ services:
   # Database service (PostgreSQL)
   db:
     image: postgres:17
-    container_name: "db"
     env_file:
       - .env
     environment:
