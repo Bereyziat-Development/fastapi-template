@@ -84,4 +84,4 @@ networks:
 
 volumes:
   app-db-data:
-  app-file-storage: # Uncomment to persist files (recommended to use an S3 bucket instead for production)
+  # app-file-storage: # Uncomment to persist files (recommended to use an S3 bucket instead for production)
