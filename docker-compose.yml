@@ -121,8 +121,12 @@ services:
       - "--certificatesresolvers.myresolver.acme.email=jonathan@bereyziat.dev"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "443:443"
-      - "8080:8080"
+      - published: 443
+        target: 443
+        protocol: tcp
+      - published: 8080
+        target: 8080
+        protocol: tcp
     volumes:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
