@@ -12,10 +12,10 @@ services:
     command:
       - --log.level=INFO
       - --api.dashboard=true
-      - --providers.docker=true
+      - --providers.swarm=true
       - --providers.docker.network=${TRAEFIK_PUBLIC_NETWORK?Variable not set}
       - --providers.docker.constraints=Label(`traefik.constraint-label-stack`, `${TRAEFIK_TAG?Variable not set}`)
-      - --providers.docker.exposedbydefault=false
+      - --providers.swarm.exposedbydefault=false
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --certificatesresolvers.le.acme.email=${EMAIL?Variable not set}
