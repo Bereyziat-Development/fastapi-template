@@ -186,6 +186,12 @@ Create the traefik public network
 docker network create --driver=overlay traefik-public
 ````
 
+Create a directory for Let’s Encrypt data
+````
+mkdir ./letsencrypt
+chmod 600 ./letsencrypt
+````
+
 Export those env vars 
 ````
 export TAG=stag
