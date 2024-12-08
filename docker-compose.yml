@@ -124,6 +124,8 @@ services:
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: "pgadmin"
+    env_file:
+      - .env
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL?Variable not set}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD?Variable not set}
