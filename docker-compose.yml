@@ -86,14 +86,6 @@ services:
       - traefik.http.routers.pgadmin-https.tls=true
       - traefik.http.routers.pgadmin-https.tls.certresolver=le
 
-  # whoami:
-  #     image: "traefik/whoami"
-  #     container_name: "simple-service"
-  #     labels:
-  #       - "traefik.enable=true"
-  #       - "traefik.http.routers.whoami.rule=Host(`${DOMAIN?Variable not set}`)"
-  #       - "traefik.http.routers.whoami.entrypoints=web"
-
 volumes:
   app-db-data:
   app-file-storage:
