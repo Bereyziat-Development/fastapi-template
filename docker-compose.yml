@@ -1,53 +1,6 @@
-# version: "3.9"
-
-# services:
-#   traefik:
-#     image: "traefik:v3.2"
-#     container_name: "traefik"
-#     command:
-#       - "--log.level=DEBUG" # Optional, helps in debugging
-#       - "--api.insecure=true" # Enable Traefik dashboard (accessible at :8080)
-#       - "--providers.docker=true" # Enable Docker provider
-#       - "--providers.docker.exposedbydefault=false" # Prevents exposing all services by default
-#       - "--entryPoints.websecure.address=:443" # Define the HTTPS entry point
-#       - "--certificatesresolvers.myresolver.acme.tlschallenge=true" # Enable TLS challenge for Let's Encrypt
-#       - "--certificatesresolvers.myresolver.acme.email=jonathan@bereyziat.dev" # Email for Let's Encrypt
-#       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" # Store cert data in a file
-#     ports:
-#       - "443:443" # HTTPS
-#       - "8080:8080" # Traefik dashboard
-#     volumes:
-#       - "/var/run/docker.sock:/var/run/docker.sock:ro" # Access Docker socket
-#       - "./letsencrypt:/letsencrypt" # Persist Let's Encrypt data
-#     networks:
-#       - traefik-public
-#     labels:
-#       - "traefik.enable=true"
-#       - "traefik.http.routers.traefik.rule=Host(`traefik.service.lestario.com`)"
-#       - "traefik.http.routers.traefik.entrypoints=websecure"
-#       - "traefik.http.routers.traefik.tls.certresolver=myresolver"
-#       - "traefik.http.routers.traefik.service=api@internal" # Expose Traefik's dashboard over HTTPS
-
-#   whoami:
-#     image: "traefik/whoami"
-#     container_name: "whoami"
-#     labels:
-#       - "traefik.enable=true"
-#       - "traefik.http.routers.whoami.rule=Host(`service.lestario.com`)"
-#       - "traefik.http.routers.whoami.entrypoints=websecure"
-#       - "traefik.http.routers.whoami.tls.certresolver=myresolver"
-#     networks:
-#       - traefik-public
-
-# networks:
-#   traefik-public:
-#     driver: overlay
-#     attachable: true
-
 version: "3.9"
 
 services:
-  # Traefik service (Reverse Proxy)
   traefik:
     image: "traefik:v3.2"
     container_name: "traefik"
@@ -56,13 +9,11 @@ services:
       - "--api.insecure=true" # Enable Traefik dashboard (accessible at :8080)
       - "--providers.docker=true" # Enable Docker provider
       - "--providers.docker.exposedbydefault=false" # Prevents exposing all services by default
-      - "--entryPoints.web.address=:80" # HTTP entry point
-      - "--entryPoints.websecure.address=:443" # HTTPS entry point
-      - "--certificatesresolvers.le.acme.email=jonathan@bereyziat.dev" # Let's Encrypt email
-      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json" # Store Let's Encrypt certs
-      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web" # HTTP challenge for Let's Encrypt
+      - "--entryPoints.websecure.address=:443" # Define the HTTPS entry point
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true" # Enable TLS challenge for Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.email=jonathan@bereyziat.dev" # Email for Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" # Store cert data in a file
     ports:
-      - "80:80" # HTTP (Lets Encrypt challenge)
       - "443:443" # HTTPS
       - "8080:8080" # Traefik dashboard
     volumes:
@@ -70,21 +21,16 @@ services:
       - "./letsencrypt:/letsencrypt" # Persist Let's Encrypt data
     networks:
       - traefik-public
-    deploy:
-      placement:
-        constraints:
-          - node.role == manager
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik-public"
-      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.service.lestario.com`)"
-      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
-      - "traefik.http.routers.traefik-dashboard.tls.certresolver=le"
-      - "traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.service.lestario.com`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.routers.traefik.service=api@internal" # Expose Traefik's dashboard over HTTPS
 
-  # Backend service
+      # Backend service
   backend:
-    image: lestario-backend:${TAG-latest}
+    image: "lestario-backend"
     container_name: "backend"
     env_file:
       - .env
@@ -92,19 +38,13 @@ services:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=https://${DOMAIN?Variable not set}
     networks:
-      - default
+      # - default
       - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik-public"
-      - "traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}"
-      - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`)"
-      - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.entrypoints=web"
-      - "traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80"
-      - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.rule=PathPrefix(`/api`) || PathPrefix(`/docs`)"
-      - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.entrypoints=websecure"
-      - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.tls=true"
-      - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.tls.certresolver=le"
+      - "traefik.http.routers.whoami.rule=Host(`service.lestario.com`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
 
   # Database service (PostgreSQL)
   db:
@@ -120,30 +60,122 @@ services:
       - default
       - traefik-public
 
-  # pgAdmin service
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: "pgadmin"
-    env_file:
-      - .env
-    networks:
-      - default
-      - traefik-public
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik-public"
-      - "traefik.http.routers.pgadmin-http.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)"
-      - "traefik.http.routers.pgadmin-http.entrypoints=web"
-      - "traefik.http.routers.pgadmin-http.middlewares=${STACK_NAME?Variable not set}-https-redirect"
-      - "traefik.http.routers.pgadmin-https.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)"
-      - "traefik.http.routers.pgadmin-https.entrypoints=websecure"
-      - "traefik.http.routers.pgadmin-https.tls=true"
-      - "traefik.http.routers.pgadmin-https.tls.certresolver=le"
-
-volumes:
-  app-db-data:
+  # whoami:
+  #   image: "traefik/whoami"
+  #   container_name: "whoami"
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.whoami.rule=Host(`service.lestario.com`)"
+  #     - "traefik.http.routers.whoami.entrypoints=websecure"
+  #     - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+  #   networks:
+  #     - traefik-public
 
 networks:
   traefik-public:
     driver: overlay
     attachable: true
+
+# version: "3.9"
+
+# services:
+#   # Traefik service (Reverse Proxy)
+#   traefik:
+#     image: "traefik:v3.2"
+#     container_name: "traefik"
+#     command:
+#       - "--log.level=DEBUG" # Optional, helps in debugging
+#       - "--api.insecure=true" # Enable Traefik dashboard (accessible at :8080)
+#       - "--providers.docker=true" # Enable Docker provider
+#       - "--providers.docker.exposedbydefault=false" # Prevents exposing all services by default
+#       - "--entryPoints.web.address=:80" # HTTP entry point
+#       - "--entryPoints.websecure.address=:443" # HTTPS entry point
+#       - "--certificatesresolvers.le.acme.email=jonathan@bereyziat.dev" # Let's Encrypt email
+#       - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json" # Store Let's Encrypt certs
+#       - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web" # HTTP challenge for Let's Encrypt
+#     ports:
+#       - "80:80" # HTTP (Lets Encrypt challenge)
+#       - "443:443" # HTTPS
+#       - "8080:8080" # Traefik dashboard
+#     volumes:
+#       - "/var/run/docker.sock:/var/run/docker.sock:ro" # Access Docker socket
+#       - "./letsencrypt:/letsencrypt" # Persist Let's Encrypt data
+#     networks:
+#       - traefik-public
+#     deploy:
+#       placement:
+#         constraints:
+#           - node.role == manager
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.docker.network=traefik-public"
+#       - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.service.lestario.com`)"
+#       - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+#       - "traefik.http.routers.traefik-dashboard.tls.certresolver=le"
+#       - "traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080"
+
+#   # Backend service
+#   backend:
+#     image: lestario-backend:${TAG-latest}
+#     container_name: "backend"
+#     env_file:
+#       - .env
+#     environment:
+#       - SERVER_NAME=${DOMAIN?Variable not set}
+#       - SERVER_HOST=https://${DOMAIN?Variable not set}
+#     networks:
+#       - default
+#       - traefik-public
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.docker.network=traefik-public"
+#       - "traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}"
+#       - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`)"
+#       - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.entrypoints=web"
+#       - "traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80"
+#       - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.rule=PathPrefix(`/api`) || PathPrefix(`/docs`)"
+#       - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.entrypoints=websecure"
+#       - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.tls=true"
+#       - "traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.tls.certresolver=le"
+
+#   # Database service (PostgreSQL)
+#   db:
+#     image: postgres:17
+#     container_name: "db"
+#     env_file:
+#       - .env
+#     environment:
+#       - PGDATA=/var/lib/postgresql/data/pgdata
+#     volumes:
+#       - app-db-data:/var/lib/postgresql/data/pgdata
+#     networks:
+#       - default
+#       - traefik-public
+
+#   # pgAdmin service
+#   pgadmin:
+#     image: dpage/pgadmin4:latest
+#     container_name: "pgadmin"
+#     env_file:
+#       - .env
+#     networks:
+#       - default
+#       - traefik-public
+#     labels:
+#       - "traefik.enable=true"
+#       - "traefik.docker.network=traefik-public"
+#       - "traefik.http.routers.pgadmin-http.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)"
+#       - "traefik.http.routers.pgadmin-http.entrypoints=web"
+#       - "traefik.http.routers.pgadmin-http.middlewares=${STACK_NAME?Variable not set}-https-redirect"
+#       - "traefik.http.routers.pgadmin-https.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)"
+#       - "traefik.http.routers.pgadmin-https.entrypoints=websecure"
+#       - "traefik.http.routers.pgadmin-https.tls=true"
+#       - "traefik.http.routers.pgadmin-https.tls.certresolver=le"
+
+# volumes:
+#   app-db-data:
+
+# networks:
+#   traefik-public:
+#     driver: overlay
+#     attachable: true
