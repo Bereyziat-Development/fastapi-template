@@ -1,21 +1,19 @@
 services:
   proxy:
     image: traefik:3.2
-    container_name: traefik
+    container_name: name
     networks:
       - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
       - default
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /path/to/traefik.yml:/etc/traefik/traefik.yml
-      - /path/to/acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
     command:
-      - --log.level=INFO
-      - --api.dashboard=true
       - --providers.swarm=true
-      - --providers.docker.network=${TRAEFIK_PUBLIC_NETWORK?Variable not set}
-      - --providers.docker.constraints=Label(`traefik.constraint-label-stack`, `${TRAEFIK_TAG?Variable not set}`)
+      - --providers.docker.constraints=Label(traefik.constraint-label-stack, ${TRAEFIK_TAG?Variable not set})
       - --providers.swarm.exposedbydefault=false
+      - --accesslog=true
+      - --log=true
+      - --api.dashboard=true
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --certificatesresolvers.le.acme.email=${EMAIL?Variable not set}
@@ -25,20 +23,23 @@ services:
       placement:
         constraints:
           - node.role == manager
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK?Variable not set}
-      - traefik.constraint-label=${TRAEFIK_PUBLIC_TAG?Variable not set}
-      - traefik.http.middlewares.${STACK_NAME?Variable not set}-https-redirect.redirectscheme.scheme=https
-      - traefik.http.middlewares.${STACK_NAME?Variable not set}-https-redirect.redirectscheme.permanent=true
-      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.rule=Host(`${DOMAIN?Variable not set}`) || Host(`www.${DOMAIN?Variable not set}`)
-      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.entrypoints=web
-      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.middlewares=${STACK_NAME?Variable not set}-www-redirect,${STACK_NAME?Variable not set}-https-redirect
-      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.rule=Host(`${DOMAIN?Variable not set}`) || Host(`www.${DOMAIN?Variable not set}`)
-      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.entrypoints=websecure
-      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.tls=true
-      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.tls.certresolver=le
-
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK?Variable not set}
+        - traefik.constraint-label=${TRAEFIK_PUBLIC_TAG?Variable not set}
+        - traefik.http.middlewares.${STACK_NAME?Variable not set}-https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.${STACK_NAME?Variable not set}-https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.rule=Host(${DOMAIN?Variable not set}) || Host(www.${DOMAIN?Variable not set})
+        - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.middlewares=${STACK_NAME?Variable not set}-www-redirect,${STACK_NAME?Variable not set}-https-redirect
+        - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.rule=Host(${DOMAIN?Variable not set}) || Host(www.${DOMAIN?Variable not set})
+        - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.entrypoints=https
+        - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.tls=true
+        - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.tls.certresolver=le
+        - traefik.http.services.${STACK_NAME?Variable not set}-proxy.loadbalancer.server.port=80
+        - traefik.http.middlewares.${STACK_NAME?Variable not set}-www-redirect.redirectregex.regex=^https?://(www.)?(${DOMAIN?Variable not set})/(.*)
+        - traefik.http.middlewares.${STACK_NAME?Variable not set}-www-redirect.redirectregex.replacement=https://${DOMAIN?Variable not set}/$${3}
+        - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.middlewares=${STACK_NAME?Variable not set}-www-redirect
   db:
     image: postgres:17
     volumes:
