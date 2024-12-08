@@ -59,6 +59,14 @@ services:
       dockerfile: backend.dockerfile
       args:
         ENV_CONFIG: ${ENV_CONFIG-dev}
+    env_file:
+      - .env
+    volumes:
+      - app-file-storage:/app/files
+    environment:
+      - ENV_CONFIG=${ENV_CONFIG-dev}
+      - SERVER_NAME=${DOMAIN?Variable not set}
+      - SERVER_HOST=http://${DOMAIN?Variable not set}
     networks:
       - default
       - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
@@ -72,6 +80,8 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:latest
+    env_file:
+      - .env
     networks:
       - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
       - default
