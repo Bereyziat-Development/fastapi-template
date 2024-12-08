@@ -84,6 +84,7 @@ services:
 
   # Backend service
   backend:
+    image: lestario-backend:${TAG-latest}
     container_name: "backend"
     env_file:
       - .env
