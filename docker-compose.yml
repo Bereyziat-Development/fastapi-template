@@ -1,34 +1,45 @@
-services:
+version: "3.9"
 
+services:
   traefik:
     image: "traefik:v3.2"
     container_name: "traefik"
     command:
-      #- "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.swarm=true"
-      - "--providers.swarm.exposedbydefault=false"
-      - "--entryPoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.myresolver.acme.email=jonathan@bereyziat.dev"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=DEBUG" # Optional, helps in debugging
+      - "--api.insecure=true" # Enable Traefik dashboard (accessible at :8080)
+      - "--providers.docker=true" # Enable Docker provider
+      - "--providers.docker.exposedbydefault=false" # Prevents exposing all services by default
+      - "--entryPoints.websecure.address=:443" # Define the HTTPS entry point
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true" # Enable TLS challenge for Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.email=jonathan@bereyziat.dev" # Email for Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" # Store cert data in a file
     ports:
-      - published: 443
-        target: 443
-        protocol: tcp
-      - published: 8080
-        target: 8080
-        protocol: tcp
+      - "443:443" # HTTPS
+      - "8080:8080" # Traefik dashboard
     volumes:
-      - "./letsencrypt:/letsencrypt"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" # Access Docker socket
+      - "./letsencrypt:/letsencrypt" # Persist Let's Encrypt data
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.service.lestario.com`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.routers.traefik.service=api@internal" # Expose Traefik's dashboard over HTTPS
 
   whoami:
     image: "traefik/whoami"
-    container_name: "simple-service"
+    container_name: "whoami"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`service.lestario.com`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    driver: overlay
+    attachable: true
