@@ -20,7 +20,6 @@ def apply_changes(db: Session, db_item: ModelType) -> None:
     db.commit()
     db.refresh(db_item)
 
-
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, model: Type[ModelType]):
         """

@@ -16,13 +16,10 @@ Here is what you will be able to find out the box here:
 - ✍️ CRUD: easy to setup and to replicate
 - 🤖 Pytest: unit tests
 - 🐳 Docker stack for development
-- 🌊 DigitalOcean quick deploy (⏳WORK IN PROGRESS⏳)
 
-## Quick deploy option
+## Deployment
 
-Digital ocean quick deploy button is already supported for this template but does not manage environment variable auto-creation yet this should be available by February 2024. If you decide to use this repo as a template for your project don't forget to update the link of the button to point to your repo instead of the template.
-
-[![Deploy to Digital Ocean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/Bereyziat-Development/fastapi-template/tree/main)
+This template is all set for a simple deployment on a VPS-like server using docker compose and traefik as a load balancer. Simply update the env vars of Traefik to match your project and follow the deployment instruction in the DEPLOY.md file.
 
 ## Requirements
 
@@ -183,18 +180,16 @@ This template implement local storage of files. This means that the files like p
 
 ## ⛔️ Warning and template usage
 
-This template is designed to be deployed with a Paas service like [Digital Ocean App Platform](https://docs.digitalocean.com/products/app-platform/), or your own Kubernetes/Docker Swarm configuration. 
+This template is designed to be deployed on a VPS, or your own Kubernetes/Docker Swarm configuration. 
 The `docker-compose.yml` file of this template is designed to provide an all inclusive development experience (db, file storage, pgadmin...).
-It could be used as it is in the context of testing or for a small scale deployment but remains poorly scalable and is not suited for production or commercial use.
+It could be used as it is in the context of testing or for a small scale deployment but remains poorly scalable and is not suited for production or big scale commercial use.
 
 ## Things that will be added (or not depending if we have time 🫣)
 
 ### Devops related upgrade:
-- Move Database to PSQL on Digital Ocean. DB in production will be separated to allow replication (a docker stack for local development will still be available with postgres 15 -> Latest version available on digital ocean)
 - Test and cleanup the gunicorn config files
-- Genereate poetry export --without-hashes --format=requirements.txt > requirements.txt on commit or on push
 - Add GitHub actions (run test, listing on push etc)
-- Add a monitoring tool as part of the stack (Prometeus for metrics and Signal for instrumentation) - See if necessary since we use Digital ocean
+- Add a monitoring tool as part of the stack (Prometeus for metrics and Signal for instrumentation)
 
 ### Ideas for later
 - Update to utilize Async technology (for endpoints that can benefit from it) https://medium.com/@neverwalkaloner/fastapi-with-async-sqlalchemy-celery-and-websockets-1b40cd9528da#:~:text=Starting%20from%20version%201.4%20SQLAlchemy,let's%20start%20with%20database%20connection. https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html

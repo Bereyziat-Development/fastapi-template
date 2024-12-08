@@ -38,7 +38,7 @@ keepalive_str = os.getenv("KEEP_ALIVE", "5")
 
 # Gunicorn config variables
 loglevel = use_loglevel
-workers = web_concurrency
+workers = 1 # TODO: to change to web_concurrency when testing is done
 bind = use_bind
 errorlog = use_errorlog
 worker_tmp_dir = "/dev/shm"

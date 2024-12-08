@@ -11,6 +11,7 @@ COPY ./scripts/start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
 COPY . /app
+
 WORKDIR /app/
 
 ENV PYTHONPATH=/app
