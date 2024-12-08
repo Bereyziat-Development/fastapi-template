@@ -76,6 +76,9 @@ networks:
     driver: overlay
     attachable: true
 
+volumes:
+  app-db-data:
+
 # version: "3.9"
 
 # services:
