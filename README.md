@@ -13,9 +13,10 @@ Here is what you will be able to find out the box here:
 - 💽 PostgreSQL/SQLAlchemy: ORM managed database
 - 🏁 Alembic: database migration
 - 🗂️ File storage: file management on local disk
+- 👾 UV: Rust based python package manager
 - ✍️ CRUD: easy to setup and to replicate
 - 🤖 Pytest: unit tests
-- 🐳 Docker stack for development
+- 🐳 Docker stack for development and deployment
 
 ## Deployment
 
@@ -25,7 +26,7 @@ This template is all set for a simple deployment on a VPS-like server using dock
 
 * [Docker](https://www.docker.com/).
 * [Docker Compose](https://docs.docker.com/compose/install/).
-* [Poetry](https://python-poetry.org/) for Python package and environment management.
+* [uv](https://docs.astral.sh/uv/) for Python package and environment management.
 
 ## Local development
 
@@ -65,38 +66,38 @@ docker compose logs backend
 
 If your Docker is not running in `localhost` (the URLs above wouldn't work) check the sections below on **Development with a custom IP**.
 
-### Poetry
+### Package management with uv
 
-By default, the dependencies are managed with [Poetry](https://python-poetry.org/), go there and install it.
-
-From `./` you can install all the dependencies with:
+By default, the dependencies are managed with [uv](https://docs.astral.sh/uv/). You can install uv using pip or with their standalone installer:
 
 ```Bash
-poetry install
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Then you can start a shell session with the new environment with:
+From the root folder of the project, install all the dependencies with:
 
 ```Bash
-poetry shell
+uv sync
 ```
+
+That's it, ou are all set!
 
 If you are using VSCode you can simply open the root of the project using the `code` command:
 ```Bash
 code .
 ```
 
-The environment in VSCode should be selected automatically. Otherwise you can specify your interpreter path by copy pasting the path of the freshly created poetry environment.
+The environment in VSCode should be selected automatically. Otherwise you can specify your interpreter path from the .venv folder created by the `uv sync` command.
 
-Modify or add SQLAlchemy models in `./app/models/`, Pydantic schemas in `./app/schemas/`, API endpoints in `./app/api/`, CRUD (Create, Read, Update, Delete) utils in `./app/crud/`. The easiest might be to copy existing ones (models, endpoints, and CRUD utils) and update them to your needs. Don't forget to run a migration using alembic if you do some changes to the models.
+Modify or add SQLAlchemy models in `./app/models/`, Pydantic schemas in `./app/schemas/`, API endpoints in `./app/api/`, CRUD (Create, Read, Update, Delete) utils in `./app/crud/`. The easiest might be to copy existing ones (models, endpoints, and CRUD utils) and update them to your needs. Don't forget to run a migration using alembic if you change the models.
 
 ### Docker Compose files
 
-There is a main `docker-compose.yml` file with all the configurations that apply to the whole stack, it is used automatically by `docker compose`.
+There is a main `docker-compose.yml` file with all the configurations that apply to the whole stack, it is used automatically by `docker compose`. This compose file is targeted toward development hence it does not spin up the Traefik service. For example to mount the source code as a volume and run the `start-reload.sh` script to enable hot-reload.
 
-And there's also a `docker-compose.override.yml` with overrides for development, for example to mount the source code as a volume and run the `start-reload.sh` script to enable hot-reload. It is used automatically by `docker compose` to apply overrides on top of `docker-compose.yml`.
+And there's also a more advanced `docker-compose.prod.yml` targeted for deployment, it is used by the `deploy.sh` script.
 
-These Docker Compose files use the `.env` file containing configurations to be injected as environment variables in the containers.
+These Docker Compose files use the `.env` file containing configurations to inject environment variables in the containers.
 
 ## Testing
 

@@ -1,21 +1,19 @@
 # DOMAIN=<YOUR_PROJECT_DOMAIN>
 DOMAIN=localhost
 
-# Traefik setup
-TRAEFIK_PUBLIC_NETWORK=traefik-public
-TRAEFIK_TAG=template-com
-TRAEFIK_PUBLIC_TAG=traefik-public
+LETSENCRYPT_EMAIL=email@example.com
 
 # STACK_NAME=<PROJECT_NAME>-com
 STACK_NAME=template-com
-ENV_CONFIG=dev
+TAG=dev
 
 DOCKER_IMAGE_BACKEND=backend-template
+BACKEND_TIMEOUT=120
 
 # Backend
 # Complete and adapt this list to your own domain or local development need
 # By default cors are disabled for dev environment
-BACKEND_CORS_ORIGINS=["http://localhost","http://localhost:4200","http://localhost:4000","http://localhost:3000","http://localhost:8080","https://localhost","https://localhost:4200","https://localhost:3000","https://localhost:8080","http://dev.customdomain.com","https://stag.customdomain.com","https://customdomain.com"]
+BACKEND_CORS_ORIGINS=["http://dev.customdomain.com","http://stag.customdomain.com","https://stag.customdomain.com","https://customdomain.com"]
 PROJECT_NAME=Template project - FastAPI 
 SECRET_KEY=some-super-secret-key
 FIRST_SUPERUSER=admin@example.com
@@ -36,6 +34,7 @@ POSTGRES_PASSWORD=some-super-secret-password
 POSTGRES_DB=template-app
 
 # PgAdmin
+PGADMIN_LISTEN_PORT=5050
 PGADMIN_DEFAULT_EMAIL=admin@example.com
 PGADMIN_DEFAULT_PASSWORD=Password1234
 
