@@ -42,4 +42,5 @@ jobs:
       # Run the tests inside Docker container (equivalent to your test-local.sh)
       - name: Run tests
         run: |
-          docker-compose exec backend sh -c '/app/tests-start.sh -x'
+          docker compose up -d
+          docker compose exec backend sh -c '/app/tests-start.sh -x'
