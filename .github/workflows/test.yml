@@ -1,0 +1,41 @@
+name: Test Dockerized Application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged # Optional: grants privileges to Docker
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Set up Docker Compose (this is optional, but useful if you have a docker-compose.yml)
+      - name: Set up Docker Compose
+        uses: docker/compose-action@v2
+
+      # Build the Docker containers
+      - name: Build Docker images
+        run: docker-compose build
+
+      # Run the tests inside Docker container (equivalent to your test-local.sh)
+      - name: Run tests
+        run: |
+          docker-compose exec backend sh -c '/app/tests-start.sh -x'
