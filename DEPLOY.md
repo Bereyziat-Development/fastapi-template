@@ -167,7 +167,7 @@ curl -L "https://github.com/docker/compose/releases/latest/download/docker-compo
 chmod +x /usr/local/bin/docker-compose
 ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 source ~/.profile
-docker-compose --version
+docker compose version
 ````
 
 Init the docker swarm

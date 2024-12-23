@@ -1,0 +1,48 @@
+name: Test Dockerized Application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:latest
+        options: --privileged # Optional: grants privileges to Docker
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Copy the .env.testing file to .env
+      - name: Copy .env.testing to .env
+        run: cp .env.testing .env
+
+      # Install Docker Compose
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker compose version
+
+      # Build the Docker containers
+      - name: Build Docker images
+        run: docker compose up -d
+
+      # Run the tests inside Docker container
+      - name: Run tests
+        run: |
+          docker compose exec backend sh -c '/app/scripts/tests-start.sh -x'
