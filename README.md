@@ -109,9 +109,9 @@ To test the backend during development on your local machine, make sure your doc
 docker compose up -d
 ```
 
-Then proceed with running the test-local.sh script
+Then proceed with running the test.sh script
 ```Bash
-sh ./scripts/test-local.sh
+sh ./scripts/test.sh
 ```
 
 ### Test Coverage
@@ -124,7 +124,7 @@ Because the test scripts forward arguments to `pytest`, for example:
 To run the local tests with coverage HTML reports:
 
 ```Bash
-sh ./scripts/test-local.sh --cov=app --cov-report=html
+sh ./scripts/test.sh --cov=app --cov-report=html
 ```
 
 ## Migrations
