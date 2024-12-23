@@ -12,7 +12,7 @@ from pydantic import (
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class EnvConfig(str, Enum):
+class EnvTag(str, Enum):
     DEV = "dev"
     STAG = "staging"
     PROD = "prod"
@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", ...]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
-    ENV_CONFIG: EnvConfig = EnvConfig.DEV
+    TAG: EnvTag = EnvTag.DEV
 
     PROJECT_NAME: str
     POSTGRES_SERVER: str = "db"

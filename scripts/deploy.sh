@@ -3,7 +3,6 @@ set -euo pipefail
 
 # Required environment variables
 : "${DOMAIN:?DOMAIN variable not set}"
-: "${TRAEFIK_TAG:?TRAEFIK_TAG variable not set}"
 : "${STACK_NAME:?STACK_NAME variable not set}"
 : "${TAG:?TAG variable not set}"
 

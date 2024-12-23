@@ -148,7 +148,7 @@ This is an example of how to quickly deploy your project. Keep in mind to challe
 
 Set the hostname of your server
 ````
-export USE_HOSTNAME=service.lestario.com
+export USE_HOSTNAME=<yourdomain.com>
 echo $USE_HOSTNAME > /etc/hostname
 hostname -F /etc/hostname
 ````
@@ -195,10 +195,8 @@ chmod 600 ./letsencrypt
 Export those env vars 
 ````
 export TAG=stag
-export ENV_CONFIG=stag
 export DOMAIN=yourdomain.com
-export TRAEFIK_TAG=yourdomain.com
-export STACK_NAME=yourdomain-com
+export STACK_NAME=your-stack-name
 ````
 
 WARNING: Depending on your project requirements you may want to avoid setting secret data using .env or variable export. A more production ready solution would be to use a secret manager.
@@ -220,27 +218,25 @@ sudo git pull
 Set the env vars:
 ````
 export TAG=stag
-export ENV_CONFIG=stag
 export DOMAIN=yourdomain.com
-export TRAEFIK_TAG=yourdomain.com
-export STACK_NAME=yourdomain-com
+export STACK_NAME=your-stack-name
 ````
 Rebuild and deploy your project using the deploy.sh script. To make sure your changes are propagated to your website make sure to restart your backend container.
 ````
 bash scripts/deploy.sh
 
-docker service update --force your-stack-name_backend -d
+docker service update --force "${STACK_NAME}_backend" -d
 ````
 
 You can now check the logs of your app and grab a coffee ☕️ while watching request popping in:
 ````
 docker ps
-docker logs <backend-container-id> -f
+docker service logs -f "${STACK_NAME}_backend"
 ````
 
 # How to completely delete my stack?
 ````
-docker stack rm service-lestario-api
+docker stack rm "${STACK_NAME}"
 docker swarm leave --force
 ````
 
@@ -251,7 +247,7 @@ docker volume rm $(docker volume ls -q)
 ````
 
 
-You can also remove all the docker data with:
+Optionally you can also remove all the unused docker data with, this will not affect any running containers:
 ````
 docker system prune
 ````

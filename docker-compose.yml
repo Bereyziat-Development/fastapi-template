@@ -1,87 +1,44 @@
 services:
-  proxy:
-    image: "traefik:v3.2.1"
-    command:
-      - "--log.level=DEBUG" # Optional, helps in debugging
-      - "--api.insecure=true" # Enable Traefik dashboard (accessible at :8080)
-      - "--providers.docker=true" # Enable Docker provider
-      - "--providers.docker.exposedbydefault=false" # Prevents exposing all services by default
-      - "--entryPoints.websecure.address=:443" # Define the HTTPS entry point
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true" # Enable TLS challenge for Let's Encrypt
-      - "--certificatesresolvers.myresolver.acme.email=jonathan@bereyziat.dev" # Email for Let's Encrypt
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json" # Store cert data in a file
-    ports:
-      - "443:443" # HTTPS
-      - "8080:8080" # Traefik dashboard
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro" # Access Docker socket
-      - "./letsencrypt:/letsencrypt" # Persist Let's Encrypt data
-    networks:
-      - traefik-public
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN?Variable not set}`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
-      - "traefik.http.routers.traefik.service=api@internal" # Expose Traefik's dashboard over HTTPS
-
-      # Backend service
-  backend:
-    image: "lestario-backend:latest"
-    build:
-      dockerfile: backend.dockerfile
-      args:
-        ENV_CONFIG: ${ENV_CONFIG-dev}x
-    env_file:
-      - .env
-    # volumes: 
-      # - app-file-storage:/app/app/files # Uncomment to persist files (recommended to use an S3 bucket instead for production)
-    environment:
-      - SERVER_NAME=${DOMAIN?Variable not set}
-      - SERVER_HOST=https://${DOMAIN?Variable not set}
-    networks:
-      # - default
-      - traefik-public
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`${DOMAIN?Variable not set}`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
-      - "traefik.http.services.backend.loadbalancer.server.port=80"
-
-  # Database service (PostgreSQL)
   db:
     image: postgres:17
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/pgdata
     env_file:
       - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
-    volumes:
-      - app-db-data:/var/lib/postgresql/data/pgdata
-    networks:
-      - default
-      - traefik-public
-  
-  # PGAdmin service
+    deploy:
+      placement:
+        constraints:
+          - node.labels.${STACK_NAME?Variable not set}.app-db-data == true
+
   pgadmin:
     image: dpage/pgadmin4:latest
     env_file:
       - .env
-    networks:
-      # - default
-      - traefik-public
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)"
-      - "traefik.http.routers.pgadmin.entrypoints=websecure"
-      - "traefik.http.routers.pgadmin.tls.certresolver=myresolver"
-      - "traefik.http.services.${STACK_NAME?Variable not set}-pgadmin.loadbalancer.server.port=5050"
+    ports:
+      - 5050:5050
 
-networks:
-  traefik-public:
-    driver: overlay
-    attachable: true
+  backend:
+    image: '${DOCKER_IMAGE_BACKEND?Variable not set}'
+    build:
+      dockerfile: backend.dockerfile
+      args:
+        TAG: ${TAG-dev}
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - app-file-storage:/app/files
+    environment:
+      - TAG=${TAG-dev}
+      - SERVER_NAME=${DOMAIN?Variable not set}
+      - SERVER_HOST=http://${DOMAIN?Variable not set}
+    ports:
+      - 80:80
+    command: /start-reload.sh
+    # command: bash -c "while true; do sleep 1; done" # Uncomment to keep the container running
 
 volumes:
   app-db-data:
-  # app-file-storage: # Uncomment to persist files (recommended to use an S3 bucket instead for production)
+  app-file-storage:
