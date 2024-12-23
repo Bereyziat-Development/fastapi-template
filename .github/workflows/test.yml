@@ -36,10 +36,9 @@ jobs:
 
       # Build the Docker containers
       - name: Build Docker images
-        run: docker-compose build
+        run: docker compose up -d
 
       # Run the tests inside Docker container (equivalent to your test-local.sh)
       - name: Run tests
         run: |
-          docker compose up -d
           docker compose exec backend sh -c '/app/tests-start.sh -x'
