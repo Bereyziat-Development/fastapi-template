@@ -3,4 +3,4 @@
 # Exit in case of error
 set -e
 
-docker compose exec backend /app/tests-start.sh "$@"
+docker compose exec backend /app/scripts/tests-start.sh "$@"

@@ -45,4 +45,4 @@ jobs:
       # Run the tests inside Docker container
       - name: Run tests
         run: |
-          docker compose exec backend sh -c '/app/tests-start.sh -x'
+          docker compose exec backend sh -c '/app/scripts/tests-start.sh -x'
