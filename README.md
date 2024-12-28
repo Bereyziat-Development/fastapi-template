@@ -1,6 +1,6 @@
 # FastAPI Backend template
 
-Hey! Ever wanted to get a custom backend up and running in a couple of minutes? Well you are in the right place! 
+Hey! Ever wanted to get a custom backend up and running in a couple of minutes? Well you're in the right place! 
 
 Using FastAPI and based on [fullstack example project of Tiangolo](https://github.com/tiangolo/full-stack-fastapi-postgresql), this templates allows you to focus on your features with an organized and highly opinionated structure.
 
@@ -179,11 +179,11 @@ This templates propose an emails configuration that relies on connecting to your
 
 ## File storage/management
 
-This template implement local storage of files. This means that the files like profile pictures, documents or other files you decide to implement in your future project will be stored on the local disc of the running server. Those files are persisted using docker volume. Although its a great method to store files for a small project or during development to avoid setting up any extra configuration, it is highly encourage to replace this by a dedicated S3 object storage for your production builds.
+This template implement local storage of files. This means that the files like profile pictures, documents or other files you decide to implement in your future project will be stored on the local disc of the running server. Those files are persisted using docker volume. Although it's a great method to store files for a small project or during development to avoid setting up any extra configuration, it is highly encourage to replace this by a dedicated S3 object storage for your production builds.
 
-# 2025 Roadmap:
+# 🌟2025🌟 Roadmap:
 
-Here you will find all the features that are planned to be progressively added in the upcoming year. The template is actively maintained and will be upgraded to get all the latest upgrades from it's main libraries. Contributions are warmly welcome so don't hesitate to use it and share it! 😊
+Here you will find all the features that are planned to be progressively added in the upcoming year. The template is actively maintained and will be upgraded to get all the latest upgrades from its main libraries. Contributions are warmly welcome so don't hesitate to use it and share it! 😊
 - [⏳ In progress] Add GitHub actions (run test, listing on push etc)
 - [⏳ In progress] S3 simplified connection
 - [🔮 Planned] Add a monitoring tool as part of the stack (Prometeus for metrics and Signal for instrumentation ?)
