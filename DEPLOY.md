@@ -1,24 +1,35 @@
-Welcome to the api-template wiki!
 
-# Setup a Linux server
+# Deployment Guide
+Welcome to the complete guide for deploying any app using the FastAPI backend template! This step-by-step documentation will walk you through setting up your server, adding a basic firewall, and securing your app with a Let’s Encrypt auto-generated certificate. Perfect for beginners, this guide offers a quick, cost-efficient way to self-host your application on a VPS and test your ideas in production. 🚀
 
-### Create the server
+**DISCLAIMER:** This guide provides general steps and advice. Be sure to adapt them to fit your application’s needs and project requirements.
+## Setup a Linux server
 
-Go to your favorite host service provider ([Ionos](https://ionos.fr), [Infomaniak](https://infomaniak.com)) and create a non managed server (Cloud, dedicated or VPS).
+### Create your server
 
-### Connect to the server
+Go to your favorite host service provider ([Ionos](https://ionos.fr), [Infomaniak](https://infomaniak.com), [Digital Ocean Droplets](https://www.digitalocean.com/products/droplets), etc...) and create a non managed server (Cloud, dedicated or VPS).
+
+### Connect to your server
 Configure your SSH key (public RSA key under ~/.ssh/id_rsa.pub) or save the root access credential for the first connection, then connect to the server as a root user user:
 ```
 ssh root@<server_ip_address>
 ```
 You probably will have to add this new server to the list of known hosts. Just type 'yes' when the command line ask you about this.
 
-### Update the server
+>[!TIP]
+This step can differ depending on your provider. For example with Digital Ocean you will not have to set up your SSH connection as it will be already configured for you directly on Digital Ocean dashboard.
+
+### Update your server
 
 Update and upgrade the software on the system:
 
 ````
 apt update && apt upgrade
+````
+
+Optionally you can clean up all residual files related to your system upgrade:
+````
+apt autoremove -y && apt clean
 ````
 
 ### Set the hostname
@@ -101,7 +112,9 @@ sudo systemctl restart ssh
 
 ### \[Optional\] Passwordless login
 
-**WARNING**: This is not recommended in production
+>[!CAUTION]
+>For obvious security reasons passwordless login is not recommended in a Production environment
+
 To make your life easier you may want to navigate across your server without the need of a password. You are already identified by your SSH key so it should be sufficient for non-critical server like a staging server.
 To do so you can run the following command:
 ```
@@ -130,6 +143,9 @@ Verify if everything is setup the way you want
 ````
 sudo ufw status
 ````
+>[!CAUTION]
+> **Don’t Lock Yourself Out!**
+> If you disable access through port `22` - SSH (or any post you set up to use for your SSH connection), you risk locking yourself out of the server, especially if password login is disabled. Double-check that SSH is allowed (`sudo ufw allow ssh`) before enabling the firewall. If you lose access, recovery may require physical or alternative remote access to the server. Proceed with caution!
 
 # Add your project
 Create your target folder, for example:
@@ -142,9 +158,8 @@ To clone your project, you can use https, in this case you will need a password 
 
 
 # Deploy your stack
-This is an example of how to quickly deploy your project. Keep in mind to challenge this configuration bases on your project scale and requirements.
-
-## Setup your project
+>[!NOTE]
+>This is an example of how to quickly deploy your project. Keep in mind to challenge this configuration bases on your project scale and requirements.
 
 Set the hostname of your server
 ````
@@ -161,13 +176,14 @@ rm get-docker.sh
 ````
 
 Download and install docker-compose
-WARNING: This download channel should be pretty up to date but don't hesitate to refer to the official docker compose documentation
+>[!TIP]
+This download channel should be up to date with the latest version of docker compose. Please refer to the official docker compose documentation in case you encounter any issue during this step.
 ````
 curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 source ~/.profile
-docker-compose --version
+docker compose version
 ````
 
 Init the docker swarm
@@ -176,34 +192,33 @@ docker swarm init
 docker node ls
 ````
 
-WARNING: Depending on your server configuration you may need to assign the ip address manual using this command instead
+>[!TIP]
+Depending on your server configuration you may need to assign the ip address manual using this command instead. For example the `--advertise-addr` is necessary in when using a **Digital Ocean Droplet**.
 ````
 docker swarm init --advertise-addr <YOUR_IP_ADDRESS>
 ````
 
-Create the traefik public network
-````
-docker network create --driver=overlay traefik-public
-````
-
-Create a directory for Let’s Encrypt data
+(Optional) Create a directory to store Let’s Encrypt certificates:
 ````
 mkdir ./letsencrypt
 chmod 600 ./letsencrypt
 ````
 
-Export those env vars 
+Export the env vars of the project:
 ````
 export TAG=stag
 export DOMAIN=yourdomain.com
 export STACK_NAME=your-stack-name
 ````
 
-WARNING: Depending on your project requirements you may want to avoid setting secret data using .env or variable export. A more production ready solution would be to use a secret manager.
+>[!IMPORTANT]
+Don't forget to add your project .env file. You will have to do this manually or via scp since the .env is not in the base repo
 
-IMPORTANT: Don't forget to add your project .env file. You will have to do this manually or via scp since the .env is not in the base repo
 
-**Deploy your stack in one line**
+>[!TIP]
+Depending on your project requirements you may want to avoid setting secret data using .env or variable export. A more production ready solution would be to use a secret manager like Amazon Secrets Manager or Github Secrets.
+
+Finally you can deploy your stack in one line:
 ````
 bash scripts/deploy.sh
 ````
@@ -245,7 +260,6 @@ Remove containers and images of your project
 docker rm -f $(docker ps -a -q)
 docker volume rm $(docker volume ls -q)
 ````
-
 
 Optionally you can also remove all the unused docker data with, this will not affect any running containers:
 ````
