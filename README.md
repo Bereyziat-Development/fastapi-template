@@ -44,20 +44,20 @@ This template provides with an out of the box Dockerized deployment on a VPS-lik
     docker compose up -d
     ```
 
-    >[!TIP]
-     The first time you start your stack, it might take a bit of time to download all the docker images. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
+>[!TIP]
+The first time you start your stack, it might take a bit of time to download all the docker images. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
 
-    To check the logs, run:
+To check the logs, run:
 
-    ```bash
-    docker compose logs
-    ```
+```bash
+docker compose logs
+```
 
-    To check the logs of a specific service, add the name of the service, e.g.:
+To check the logs of a specific service, add the name of the service, e.g.:
 
-    ```bash
-    docker compose logs backend
-    ```
+```bash
+docker compose logs backend
+```
 
 Perfect! We are done here 🙌 You can now open your favorite browser and interact with these URLs:
 
