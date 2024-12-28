@@ -18,53 +18,54 @@ Here is what you will be able to find out the box here:
 - 🤖 Pytest: unit tests
 - 🐳 Docker stack for development and deployment
 
-## Deployment
-
-This template is all set for a simple deployment on a VPS-like server using docker compose and traefik as a load balancer. Simply update the env vars of Traefik to match your project and follow the deployment instruction in the DEPLOY.md file.
-
 ## Requirements
 
 * [Docker](https://www.docker.com/).
 * [Docker Compose](https://docs.docker.com/compose/install/).
 * [uv](https://docs.astral.sh/uv/) for Python package and environment management.
 
+## Deployment
+
+This template provides with an out of the box Dockerized deployment on a VPS-like linux server using Traefik as a proxy. Simply update the env vars to match your project and follow the step-by-step [Deployment Documentation](./DEPLOY.md).
+
 ## Local development
 
-* Create a .env file
+1. Create a `.env` file.
 
-* Copy the content of env-example file to your .env file
+2. Copy the content from the `env-example` file into your `.env` file.
 
-* Add/Modify the values to match your project, for example it is highly encouraged to modify the secret keys with randomly generated strings and to add your own SSO credentials for facebook, github and google if you want to use SSO in your project
+3. Uncomment the variables to activate the services relevant to your project (e.g., email, file management, SSO credentials).
 
-* Once this done you can start the stack with Docker Compose:
+4. For security, generate random strings for secret keys and add your SSO credentials (Facebook, GitHub, Google) if you plan to use SSO in your project.
 
-```bash
-docker compose up -d
-```
+5. Once the `.env` file is configured, start the stack with Docker Compose:
 
-* Now you can open your browser and interact with these URLs:
+    ```bash
+    docker compose up -d
+    ```
 
-Backend, JSON based web API based on OpenAPI: http://localhost/api/
+    **Note**: The first time you start your stack, it might take a bit of time to download all the docker images. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
 
-Automatic interactive documentation with Swagger UI (from the OpenAPI backend): http://localhost/docs
+    To check the logs, run:
 
-PGAdmin, PostgreSQL web administration: http://localhost:5050
+    ```bash
+    docker compose logs
+    ```
 
-**Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
+    To check the logs of a specific service, add the name of the service, e.g.:
 
-To check the logs, run:
+    ```bash
+    docker compose logs backend
+    ```
 
-```bash
-docker compose logs
-```
+6. Now you can open your browser and interact with these URLs:
 
-To check the logs of a specific service, add the name of the service, e.g.:
+    REST API entry point: http://localhost/api/
 
-```bash
-docker compose logs backend
-```
+    Automatic interactive documentation with Swagger UI: http://localhost/docs
 
-If your Docker is not running in `localhost` (the URLs above wouldn't work) check the sections below on **Development with a custom IP**.
+    PGAdmin, PostgreSQL admin platform: http://localhost:5050
+
 
 ### Package management with uv
 
@@ -87,21 +88,21 @@ If you are using VSCode you can simply open the root of the project using the `c
 code .
 ```
 
-The environment in VSCode should be selected automatically. Otherwise you can specify your interpreter path from the .venv folder created by the `uv sync` command.
+The python virtual environment should be selected automatically in VSCode. If not, you can specify the path to your interpreter in the `.venv` folder created by the `uv sync` command.
+
+### How to use the template?
 
 Modify or add SQLAlchemy models in `./app/models/`, Pydantic schemas in `./app/schemas/`, API endpoints in `./app/api/`, CRUD (Create, Read, Update, Delete) utils in `./app/crud/`. The easiest might be to copy existing ones (models, endpoints, and CRUD utils) and update them to your needs. Don't forget to run a migration using alembic if you change the models.
 
 ### Docker Compose files
 
-There is a main `docker-compose.yml` file with all the configurations that apply to the whole stack, it is used automatically by `docker compose`. This compose file is targeted toward development hence it does not spin up the Traefik service. For example to mount the source code as a volume and run the `start-reload.sh` script to enable hot-reload.
+The main `docker-compose.yml` file is tailored for development, automatically used by `docker compose`. It enables features like source code mounting and hot-reload via the `start-reload.sh` script but does not include the Traefik service.  
 
-And there's also a more advanced `docker-compose.prod.yml` targeted for deployment, it is used by the `deploy.sh` script.
-
-These Docker Compose files use the `.env` file containing configurations to inject environment variables in the containers.
+For deployment, the `docker-compose.prod.yml` file is used, invoked by the `deploy.sh` script. Both Compose files rely on the `.env` file to inject environment variables into the containers.
 
 ## Testing
 
-### Tests during development
+### Test during development
 
 To test the backend during development on your local machine, make sure your docker stack is running:
 
@@ -127,39 +128,48 @@ To run the local tests with coverage HTML reports:
 sh ./scripts/test.sh --cov=app --cov-report=html
 ```
 
-## Migrations
+### Continuous testing
 
-As during local development your app directory is mounted as a volume inside the container, you can also run the migrations with `alembic` commands inside the container and the migration code will be in your app directory (instead of being only inside the container). So you can add it to your git repository.
+All tests specified in the `./app/tests` directory are automatically running when pushing or opening a PR to `dev` or `main` branch. You can of course add or modify the GitHub actions in `./.github/workflows` directory according to your needs.
 
-Make sure you create a "revision" of your models and that you "upgrade" your database with that revision every time you change them. As this is what will update the tables in your database. Otherwise, your application will have SQL/ORM errors.
+## Migration
+
+During local development, your app directory is mounted as a volume inside the container. This setup allows you to run `alembic` commands directly inside the container, and the migration files will be saved in your app directory. This makes it easy to track them in your Git repository.
+
+### Steps for Database Migration
+
+1. **Generate a Revision**  
+   Whenever you make changes to your models (e.g., adding a column), you need to create a new migration revision. Simply run:  
+   ```Bash
+   sh ./scripts/new-revision.sh -m "Description of your revision"
+   ```
+   This command generates a migration script in the `./alembic/versions` directory based on your changes. **Don't forget about double checking any migration scripts before applying them.**
+
+2.	**Apply the Migration**
+    After creating the revision, apply the changes to the database by running:
+    ```Bash
+    sh ./scripts/migrate.sh
+    ```
+    This will update your database schema to match the changes in your models.
+
 
 **IMPORTANT:** If you created a new model in `./app/models/`, make sure to import it in `./app/db/base.py`, that Python module (`base.py`) that imports all the models will be used by Alembic.
 
-1. After changing a model (for example, adding a column), inside the container, create a revision
-```Bash
-sh ./scripts/new-revision.sh -m "My new revision message"
-```
-2. After creating the revision, run the migration in the database (this is what will actually change the database based on the schemas):
-
-```Bash
-sh ./scripts/migrate.sh
-```
-
 **IMPORTANT:** Remember to add and commit to the git repository the files generated in the alembic directory.
 
-If you don't want to use migrations at all, uncomment the line in the file at `./app/db/init_db.py` with:
+If you don't want to use migrations at all, uncomment the following line in the file `./app/db/init_db.py`:
 
 ```python
 Base.metadata.create_all(bind=engine)
 ```
 
-and comment the line in the file `prestart.sh` that contains:
+and comment the following line from the `prestart.sh` script:
 
 ```Bash
 alembic upgrade head
 ```
 
-If you don't want to start with the default models and want to remove/modify them, from the beginning, without having any previous revision, you can remove the revision files (`.py` Python files) under `./alembic/versions/`. And then create a first migration as described above.
+If you want to start your migration history from scratch, you can remove all the revision files (`.py` Python files) in `./alembic/versions/`. And then create an initial migration as described above.
 
 ## Emails
 
@@ -169,37 +179,24 @@ This templates propose an emails configuration that relies on connecting to your
 
 This template implement local storage of files. This means that the files like profile pictures, documents or other files you decide to implement in your future project will be stored on the local disc of the running server. Those files are persisted using docker volume. Although its a great method to store files for a small project or during development to avoid setting up any extra configuration, it is highly encourage to replace this by a dedicated S3 object storage for your production builds.
 
-## Deployment
+# Roadmap (contribution are welcome):
+- [⏳ In progress] Add GitHub actions (run test, listing on push etc)
+- [⏳ In progress] S3 simplified connection
+- [🔮 Planned] Add a monitoring tool as part of the stack (Prometeus for metrics and Signal for instrumentation ?)
+- [🔮 Planned] Connection to an email service like SendGrid or Resend
+- [💭 To be considered] Update to utilize Async technology (for endpoints that can benefit from it) https://medium.com/@neverwalkaloner/fastapi-with-async-sqlalchemy-celery-and-websockets-1b40cd9528da#:~:text=Starting%20from%20version%201.4%20SQLAlchemy,let's%20start%20with%20database%20connection. https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
+- [💭 To be considered] Migration to psycopg v3 could be considered in a future version of the template
 
-[⏳ DIGITAL OCEAN: WORK IN PROGRESS ⏳]
+## Notes from the author
 
-### CI/CD
+### ⛔️ Warning about scalability
 
-[⏳ GITHUB ACTIONS: WORK IN PROGRESS ⏳]
+This template is optimized for deployment on a single VPS or server, providing an easy-to-use solution for small to mid-size projects. The `docker-compose.prod.yml` file offers a comprehensive development setup (including DB, file storage, pgAdmin, etc.) that works well for testing or small-scale deployments. However, it is not optimized for Kubernetes or large-scale production environments out of the box. While it remains production-ready and ideal for simple, manageable structures, it may not scale efficiently for larger or more complex systems.
 
-[⏳ RUNNING TEST: WORK IN PROGRESS ⏳]
+### License and commercial use
 
-## ⛔️ Warning and template usage
-
-This template is designed to be deployed on a VPS, or your own Kubernetes/Docker Swarm configuration. 
-The `docker-compose.yml` file of this template is designed to provide an all inclusive development experience (db, file storage, pgadmin...).
-It could be used as it is in the context of testing or for a small scale deployment but remains poorly scalable and is not suited for production or big scale commercial use.
-
-## Things that will be added (or not depending if we have time 🫣)
-
-### Devops related upgrade:
-- Test and cleanup the gunicorn config files
-- Add GitHub actions (run test, listing on push etc)
-- Add a monitoring tool as part of the stack (Prometeus for metrics and Signal for instrumentation)
-
-### Ideas for later
-- Update to utilize Async technology (for endpoints that can benefit from it) https://medium.com/@neverwalkaloner/fastapi-with-async-sqlalchemy-celery-and-websockets-1b40cd9528da#:~:text=Starting%20from%20version%201.4%20SQLAlchemy,let's%20start%20with%20database%20connection. https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
-- Migration to psycopg v3 could be considered in a future version of the template
-
-### Usage & Notes from the author
-
-This template is Open-Sourced under the MIT license. This basically means that all contributions are welcome and encourage and that your can use this template or fork it for your personal and commercial use 🥳
+This template is Open-Sourced under the MIT license. This basically means that all contributions are welcome and encouraged. You can use this template or fork it for your personal and commercial use 🥳
 
 If you have questions or encounter any difficulty while using this repo do not hesitate to use the GitHub Discussions channel.
 
-If you need help to realize your project or commercial collaboration please reach out to our team by email [contact@bereyziat.dev](mailto:contact@bereyziat.dev) or check our [Website: bereyziat.dev](https://bereyziat.dev)
+If you need help on your project or look for a commercial collaboration please reach out to my team by email [contact@bereyziat.dev](mailto:contact@bereyziat.dev) or check my [website: bereyziat.dev](https://bereyziat.dev)
