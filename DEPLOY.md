@@ -5,11 +5,11 @@ Welcome to the complete guide for deploying any app using the FastAPI backend te
 **DISCLAIMER:** This guide provides general steps and advice. Be sure to adapt them to fit your application’s needs and project requirements.
 ## Setup a Linux server
 
-### Create the server
+### Create your server
 
-Create your server. Go to your favorite host service provider ([Ionos](https://ionos.fr), [Infomaniak](https://infomaniak.com), [Digital Ocean Droplets](https://www.digitalocean.com/products/droplets), etc...) and create a non managed server (Cloud, dedicated or VPS).
+Go to your favorite host service provider ([Ionos](https://ionos.fr), [Infomaniak](https://infomaniak.com), [Digital Ocean Droplets](https://www.digitalocean.com/products/droplets), etc...) and create a non managed server (Cloud, dedicated or VPS).
 
-### Connect to the server
+### Connect to your server
 Configure your SSH key (public RSA key under ~/.ssh/id_rsa.pub) or save the root access credential for the first connection, then connect to the server as a root user user:
 ```
 ssh root@<server_ip_address>
@@ -18,7 +18,7 @@ You probably will have to add this new server to the list of known hosts. Just t
 
 IMPORTANT: This step can differ depending on your provider. For example with Digital Ocean you will not have to set up your SSH connection as it will be already configured for you directly on Digital Ocean dashboard.
 
-### Update the server
+### Update your server
 
 Update and upgrade the software on the system:
 
@@ -112,6 +112,7 @@ sudo systemctl restart ssh
 ### \[Optional\] Passwordless login
 
 **WARNING**: This is not recommended in production
+
 To make your life easier you may want to navigate across your server without the need of a password. You are already identified by your SSH key so it should be sufficient for non-critical server like a staging server.
 To do so you can run the following command:
 ```
@@ -154,9 +155,8 @@ To clone your project, you can use https, in this case you will need a password 
 
 
 # Deploy your stack
-This is an example of how to quickly deploy your project. Keep in mind to challenge this configuration bases on your project scale and requirements.
-
-## Setup your project
+>[!NOTE]
+>This is an example of how to quickly deploy your project. Keep in mind to challenge this configuration bases on your project scale and requirements.
 
 Set the hostname of your server
 ````
