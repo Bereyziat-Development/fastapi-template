@@ -24,7 +24,6 @@ def read_users(
     """
     ADMIN: Retrieve users.
     """
-    return "BOOM"
     users = crud.user.get_multi(db, skip=skip, limit=limit, with_archived=with_archived)
     return users
 
