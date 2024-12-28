@@ -16,7 +16,8 @@ ssh root@<server_ip_address>
 ```
 You probably will have to add this new server to the list of known hosts. Just type 'yes' when the command line ask you about this.
 
-IMPORTANT: This step can differ depending on your provider. For example with Digital Ocean you will not have to set up your SSH connection as it will be already configured for you directly on Digital Ocean dashboard.
+>[!TIP]
+This step can differ depending on your provider. For example with Digital Ocean you will not have to set up your SSH connection as it will be already configured for you directly on Digital Ocean dashboard.
 
 ### Update your server
 
@@ -111,7 +112,8 @@ sudo systemctl restart ssh
 
 ### \[Optional\] Passwordless login
 
-**WARNING**: This is not recommended in production
+>[!CAUTION]
+>For obvious security reasons passwordless login is not recommended in a Production environment
 
 To make your life easier you may want to navigate across your server without the need of a password. You are already identified by your SSH key so it should be sufficient for non-critical server like a staging server.
 To do so you can run the following command:
@@ -141,8 +143,9 @@ Verify if everything is setup the way you want
 ````
 sudo ufw status
 ````
-### ⚠️ Warning: Don’t Lock Yourself Out!
-If you disable access through port `22` - SSH (or any post you set up to use for your SSH connection), you risk locking yourself out of the server, especially if password login is disabled. Double-check that SSH is allowed (`sudo ufw allow ssh`) before enabling the firewall. If you lose access, recovery may require physical or alternative remote access to the server. Proceed with caution!
+>[!CAUTION]
+> **Don’t Lock Yourself Out!**
+> If you disable access through port `22` - SSH (or any post you set up to use for your SSH connection), you risk locking yourself out of the server, especially if password login is disabled. Double-check that SSH is allowed (`sudo ufw allow ssh`) before enabling the firewall. If you lose access, recovery may require physical or alternative remote access to the server. Proceed with caution!
 
 # Add your project
 Create your target folder, for example:
@@ -173,7 +176,8 @@ rm get-docker.sh
 ````
 
 Download and install docker-compose
-WARNING: This download channel should be up to date with the latest version of docker compose. Please refer to the official docker compose documentation in case you encounter any issue during this step.
+>[!TIP]
+This download channel should be up to date with the latest version of docker compose. Please refer to the official docker compose documentation in case you encounter any issue during this step.
 ````
 curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
@@ -188,7 +192,8 @@ docker swarm init
 docker node ls
 ````
 
-WARNING: Depending on your server configuration you may need to assign the ip address manual using this command instead. For example the `--advertise-addr` is necessary in when using a **Digital Ocean Droplet**.
+>[!TIP]
+Depending on your server configuration you may need to assign the ip address manual using this command instead. For example the `--advertise-addr` is necessary in when using a **Digital Ocean Droplet**.
 ````
 docker swarm init --advertise-addr <YOUR_IP_ADDRESS>
 ````
@@ -206,9 +211,12 @@ export DOMAIN=yourdomain.com
 export STACK_NAME=your-stack-name
 ````
 
-**IMPORTANT:** Don't forget to add your project .env file. You will have to do this manually or via scp since the .env is not in the base repo
+>[!IMPORTANT]
+Don't forget to add your project .env file. You will have to do this manually or via scp since the .env is not in the base repo
 
-**WARNING:** Depending on your project requirements you may want to avoid setting secret data using .env or variable export. A more production ready solution would be to use a secret manager like Amazon Secrets Manager or Github Secrets.
+
+>[!TIP]
+Depending on your project requirements you may want to avoid setting secret data using .env or variable export. A more production ready solution would be to use a secret manager like Amazon Secrets Manager or Github Secrets.
 
 Finally you can deploy your stack in one line:
 ````

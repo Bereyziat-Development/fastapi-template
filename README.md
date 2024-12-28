@@ -20,9 +20,9 @@ Here is what you will be able to find out the box here:
 
 ## Requirements
 
-* [Docker](https://www.docker.com/).
-* [Docker Compose](https://docs.docker.com/compose/install/).
-* [uv](https://docs.astral.sh/uv/) for Python package and environment management.
+* [Docker](https://www.docker.com/)
+* [Docker Compose](https://docs.docker.com/compose/install/)
+* [uv](https://docs.astral.sh/uv/) for Python package and environment management
 
 ## Deployment
 
@@ -44,7 +44,8 @@ This template provides with an out of the box Dockerized deployment on a VPS-lik
     docker compose up -d
     ```
 
-    **Note**: The first time you start your stack, it might take a bit of time to download all the docker images. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
+    >[!TIP]
+     The first time you start your stack, it might take a bit of time to download all the docker images. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
 
     To check the logs, run:
 
@@ -88,13 +89,14 @@ If you are using VSCode you can simply open the root of the project using the `c
 code .
 ```
 
+>[!TIP]
 The python virtual environment should be selected automatically in VSCode. If not, you can specify the path to your interpreter in the `.venv` folder created by the `uv sync` command.
 
 ### How to use the template?
 
 Modify or add SQLAlchemy models in `./app/models/`, Pydantic schemas in `./app/schemas/`, API endpoints in `./app/api/`, CRUD (Create, Read, Update, Delete) utils in `./app/crud/`. The easiest might be to copy existing ones (models, endpoints, and CRUD utils) and update them to your needs. Don't forget to run a migration using alembic if you change the models.
 
-This setup is designed to meet the needs of most applications. When your project starts to grow feel free to add new API versions, new routers or even new services to the `docker-compose.yml` files. Keep in mind that since this is a python backend, any python library will be compatible with this stack. Linear algebra with Numpy, ML and AI with Sci-Py, Image manipulation with Pillow or OpenCV... the possibilities are endless - let your creativity shape your next big feature!
+This setup is designed to meet the needs of most applications. When your project starts to grow feel free to add new API versions, new routers or even new services to the `docker-compose.yml` files. Keep in mind that since this is a python backend, any python library will be compatible with this stack. Linear algebra with Numpy, ML and AI with Sci-Py, Image manipulation with Pillow or OpenCV... the possibilities are endless - let your creativity shape your next big feature! 🚀
 
 ### Docker Compose files
 
@@ -140,14 +142,14 @@ During local development, your app directory is mounted as a volume inside the c
 
 ### Steps for Database Migration
 
-1. **Generate a Revision**  
+#### 1. Generate a Revision
    Whenever you make changes to your models (e.g., adding a column), you need to create a new migration revision. Simply run:  
    ```Bash
    sh ./scripts/new-revision.sh -m "Description of your revision"
    ```
    This command generates a migration script in the `./alembic/versions` directory based on your changes. **Don't forget about double checking any migration scripts before applying them.**
 
-2.	**Apply the Migration**
+#### 2. Apply the Migration
     After creating the revision, apply the changes to the database by running:
     ```Bash
     sh ./scripts/migrate.sh
@@ -155,9 +157,11 @@ During local development, your app directory is mounted as a volume inside the c
     This will update your database schema to match the changes in your models.
 
 
-**IMPORTANT:** If you created a new model in `./app/models/`, make sure to import it in `./app/db/base.py`, that Python module (`base.py`) that imports all the models will be used by Alembic.
+>[!IMPORTANT]
+ If you created a new model in `./app/models/`, make sure to import it in `./app/db/base.py`, that Python module (`base.py`) that imports all the models will be used by Alembic.
 
-**IMPORTANT:** Remember to add and commit to the git repository the files generated in the alembic directory.
+>[!IMPORTANT]
+ Remember to add and commit to the git repository the files generated in the alembic directory.
 
 If you don't want to use migrations at all, uncomment the following line in the file `./app/db/init_db.py`:
 
@@ -171,6 +175,7 @@ and comment the following line from the `prestart.sh` script:
 alembic upgrade head
 ```
 
+>[!TIP]
 If you want to start your migration history from scratch, you can remove all the revision files (`.py` Python files) in `./alembic/versions/`. And then create an initial migration as described above.
 
 ## Emails
