@@ -1,6 +1,6 @@
 # FastAPI Backend template
 
-Hey! Ever wanted to get a backend all set in a couple of minutes? Well you are in the right place! 
+Hey! Ever wanted to get a custom backend up and running in a couple of minutes? Well you are in the right place! 
 
 Using FastAPI and based on [fullstack example project of Tiangolo](https://github.com/tiangolo/full-stack-fastapi-postgresql), this templates allows you to focus on your features with an organized and highly opinionated structure.
 
@@ -30,15 +30,15 @@ This template provides with an out of the box Dockerized deployment on a VPS-lik
 
 ## Local development
 
-1. Create a `.env` file.
+### How to run the stack?
+1. Create a `.env` file with initial value: 
+    ```Bash
+    cp env-example .env
+    ```
 
-2. Copy the content from the `env-example` file into your `.env` file.
+2. Uncomment the variables to activate the services relevant to your project (e.g., email, file management, SSO credentials). For security, generate random strings for secret keys.
 
-3. Uncomment the variables to activate the services relevant to your project (e.g., email, file management, SSO credentials).
-
-4. For security, generate random strings for secret keys and add your SSO credentials (Facebook, GitHub, Google) if you plan to use SSO in your project.
-
-5. Once the `.env` file is configured, start the stack with Docker Compose:
+3. Once your `.env` file is configured, start the stack with Docker Compose:
 
     ```bash
     docker compose up -d
@@ -58,18 +58,18 @@ This template provides with an out of the box Dockerized deployment on a VPS-lik
     docker compose logs backend
     ```
 
-6. Now you can open your browser and interact with these URLs:
+Perfect! We are done here 🙌 You can now open your favorite browser and interact with these URLs:
 
-    REST API entry point: http://localhost/api/
+* http://localhost/api/ - FastAPI: REST API entry point
 
-    Automatic interactive documentation with Swagger UI: http://localhost/docs
+* http://localhost/docs - Swagger: Automatic interactive API documentation
 
-    PGAdmin, PostgreSQL admin platform: http://localhost:5050
+* http://localhost:5050 - PGAdmin: PostgreSQL admin platform
 
 
-### Package management with uv
+### How to edit the code?
 
-By default, the dependencies are managed with [uv](https://docs.astral.sh/uv/). You can install uv using pip or with their standalone installer:
+First install the python dependencies locally. Dependencies are managed with [uv](https://docs.astral.sh/uv/). You can install uv using pip or with their standalone installer:
 
 ```Bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -93,6 +93,8 @@ The python virtual environment should be selected automatically in VSCode. If no
 ### How to use the template?
 
 Modify or add SQLAlchemy models in `./app/models/`, Pydantic schemas in `./app/schemas/`, API endpoints in `./app/api/`, CRUD (Create, Read, Update, Delete) utils in `./app/crud/`. The easiest might be to copy existing ones (models, endpoints, and CRUD utils) and update them to your needs. Don't forget to run a migration using alembic if you change the models.
+
+This setup is designed to meet the needs of most applications. When your project starts to grow feel free to add new API versions, new routers or even new services to the `docker-compose.yml` files. Keep in mind that since this is a python backend, any python library will be compatible with this stack. Linear algebra with Numpy, ML and AI with Sci-Py, Image manipulation with Pillow or OpenCV... the possibilities are endless - let your creativity shape your next big feature!
 
 ### Docker Compose files
 
@@ -179,7 +181,9 @@ This templates propose an emails configuration that relies on connecting to your
 
 This template implement local storage of files. This means that the files like profile pictures, documents or other files you decide to implement in your future project will be stored on the local disc of the running server. Those files are persisted using docker volume. Although its a great method to store files for a small project or during development to avoid setting up any extra configuration, it is highly encourage to replace this by a dedicated S3 object storage for your production builds.
 
-# Roadmap (contribution are welcome):
+# 2025 Roadmap:
+
+Here you will find all the features that are planned to be progressively added in the upcoming year. The template is actively maintained and will be upgraded to get all the latest upgrades from it's main libraries. Contributions are warmly welcome so don't hesitate to use it and share it! 😊
 - [⏳ In progress] Add GitHub actions (run test, listing on push etc)
 - [⏳ In progress] S3 simplified connection
 - [🔮 Planned] Add a monitoring tool as part of the stack (Prometeus for metrics and Signal for instrumentation ?)
